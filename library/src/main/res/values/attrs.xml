@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MultiStatusLayout">
+        <attr name="loadingLayout" format="reference" />
+        <attr name="emptyLayout" format="reference" />
+        <attr name="netErrorLayout" format="reference" />
+        <attr name="errorLayout" format="reference" />
+        <attr name="otherLayout" format="reference" />
+        <attr name="targetViewId" format="reference" />
+    </declare-styleable>
+</resources>
