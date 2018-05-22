@@ -6,8 +6,8 @@ import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.RelativeLayout;
-
 
 
 /**
@@ -192,7 +192,7 @@ public class MultiStatusLayout extends RelativeLayout {
     private void hideViews() {
         for (int i = 0; i < mContentViews.size(); i++) {
             View view = mContentViews.valueAt(i);
-            if (mTargetViewId != view.getId() && view.getVisibility() != GONE) {
+            if (mTargetViewId != view.getId() && view.getVisibility() != GONE && !(view instanceof ViewStub)) {
                 view.setVisibility(GONE);
             }
         }
@@ -206,7 +206,7 @@ public class MultiStatusLayout extends RelativeLayout {
         for (int i = 0; i < mContentViews.size(); i++) {
             View view = mContentViews.valueAt(i);
             if (i < mContentViewCount) {
-                if (view != null) {
+                if (view != null && !(view instanceof ViewStub)) {
                     view.setVisibility(VISIBLE);
                 }
             } else {
