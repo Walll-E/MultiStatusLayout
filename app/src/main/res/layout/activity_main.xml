@@ -20,37 +20,21 @@
          />
 
     <Button
-        android:id="@+id/btn_content"
-        android:text="数据请求成功页面"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_green_light"
-        android:layout_width="match_parent"
+        android:layout_marginTop="100dp"
+        android:id="@+id/btn_multiStatusLayout"
         app:layout_constraintTop_toBottomOf="@+id/tv_title"
-        android:layout_marginTop="20dp"
+        android:background="@color/colorAccent"
+        android:text="MultiStatusLayout"
+        android:textColor="#fff"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <Button
-        android:id="@+id/btn_netError"
-        android:text="网络错误"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_blue_light"
+        android:id="@+id/btn_multiStatusConstraintLayout"
+        app:layout_constraintTop_toBottomOf="@+id/btn_multiStatusLayout"
+        android:background="@color/colorPrimary"
+        android:text="MultiStatusConstraintLayout"
+        android:textColor="#fff"
         android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btn_error"
-        android:text="服务器错误"
-        android:textColor="@android:color/white"
-        android:background="@android:color/holo_purple"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_netError"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/btn_empty"
-        android:text="数据为空"
-        android:textColor="@android:color/white"
-        android:background="@android:color/darker_gray"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_error"
         android:layout_height="wrap_content" />
 
 

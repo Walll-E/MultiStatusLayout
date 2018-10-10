@@ -8,4 +8,13 @@
         <attr name="otherLayout" format="reference" />
         <attr name="targetViewId" format="reference" />
     </declare-styleable>
+
+    <declare-styleable name="MultiStatusConstraintLayout">
+        <attr name="constraintLoadingLayout" format="reference" />
+        <attr name="constraintEmptyLayout" format="reference" />
+        <attr name="constraintNetErrorLayout" format="reference" />
+        <attr name="constraintErrorLayout" format="reference" />
+        <attr name="constraintOtherLayout" format="reference" />
+        <attr name="constraintTargetViewId" format="reference" />
+    </declare-styleable>
 </resources>

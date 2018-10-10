@@ -16,10 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".SuccessActivity" />
-        <activity android:name=".ErrorActivity" />
-        <activity android:name=".NetErrorActivity" />
-        <activity android:name=".EmptyActivity"></activity>
+        <activity android:name=".MultiStatusConstraintLayoutActivity">
+
+        </activity>
+        <activity android:name=".MultiStatusLayoutActivity"></activity>
     </application>
 
 </manifest>

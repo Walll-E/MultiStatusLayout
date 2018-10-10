@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wall_e.multiStatusLayout.MultiStatusLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:loadingLayout="@layout/common_loading"
+    app:emptyLayout="@layout/common_empty"
+    android:id="@+id/statusLayout"
+    tools:context=".EmptyFragment">
+
+
+
+</com.wall_e.multiStatusLayout.MultiStatusLayout>

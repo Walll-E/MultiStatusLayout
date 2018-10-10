@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MultiStatusLayoutActivity">
+    <RadioGroup
+        android:id="@+id/rgp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <RadioButton
+            android:id="@+id/rb_other"
+            style="@style/rb"
+            android:background="#FFFFE240"
+            android:text="Other" />
+
+        <RadioButton
+            android:id="@+id/rb_loading"
+            style="@style/rb"
+            android:background="#4FCC3C"
+            android:text="Loading" />
+
+        <RadioButton
+            android:id="@+id/rb_netError"
+            style="@style/rb"
+            android:background="#FF40C3FF"
+            android:text="NetError" />
+
+        <RadioButton
+            android:id="@+id/rb_empty"
+            style="@style/rb"
+            android:background="#FFFF40FC"
+            android:text="Empty" />
+
+        <RadioButton
+            android:id="@+id/rb_error"
+            style="@style/rb"
+            android:background="#FFFF4059"
+            android:text="Error" />
+
+    </RadioGroup>
+
+    <FrameLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/rgp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+
+</android.support.constraint.ConstraintLayout>
