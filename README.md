@@ -15,7 +15,7 @@ allprojects {
     
     
 dependencies {
-        compile 'com.github.Walll-E:MultiStatusLayout:v1.0.1'
+        implementation 'com.github.Walll-E:MultiStatusLayout:v1.0.2'
     }
 ```
 
