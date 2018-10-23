@@ -16,10 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MultiStatusConstraintLayoutActivity">
-
-        </activity>
-        <activity android:name=".MultiStatusLayoutActivity"></activity>
+        <activity android:name=".MultiStatusConstraintLayoutActivity"/>
+        <activity android:name=".MultiStatusLayoutActivity"/>
     </application>
 
 </manifest>

@@ -5,8 +5,8 @@
     android:id="@+id/statusLayout"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:constraintEmptyLayout="@layout/common_empty"
-    app:constraintLoadingLayout="@layout/common_loading"
+    app:emptyLayout="@layout/common_empty"
+    app:loadingLayout="@layout/common_loading"
     tools:context=".ConstraintEmptyFragment">
 
 

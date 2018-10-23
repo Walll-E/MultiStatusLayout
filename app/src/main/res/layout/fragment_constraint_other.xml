@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:constraintOtherLayout="@layout/comon_other"
-    app:constraintLoadingLayout="@layout/common_loading"
+    app:otherLayout="@layout/comon_other"
+    app:loadingLayout="@layout/common_loading"
     android:id="@+id/statusLayout"
     tools:context=".ConstraintOtherFragment">
 

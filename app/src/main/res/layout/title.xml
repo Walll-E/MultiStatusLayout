@@ -10,6 +10,7 @@
         app:srcCompat="@drawable/icon_back"
         android:layout_width="50dp"
         android:scaleType="centerInside"
+        android:visibility="gone"
         android:layout_height="match_parent" />
     <View
         android:layout_width="match_parent"
@@ -22,6 +23,7 @@
         android:textColor="@android:color/black"
         android:layout_centerInParent="true"
         android:textSize="20dp"
+        android:text="Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

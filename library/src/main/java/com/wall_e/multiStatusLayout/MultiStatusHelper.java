@@ -2,18 +2,18 @@ package com.wall_e.multiStatusLayout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.RelativeLayout;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
-/**
- * Created by Wall-E on 2017/4/14.
- */
-
-public class MultiStatusLayout extends RelativeLayout {
+public class MultiStatusHelper {
 
 
     private Context mContext;
@@ -55,30 +55,20 @@ public class MultiStatusLayout extends RelativeLayout {
      */
     private OnReloadDataListener onReloadDataListener;
 
-    private int mViewType = -1;
-
-
+    private int mViewType = 0;
     /**
      * 放置其他五种状态的索引容器
      */
     private View[] mContentViews = new View[5];
 
+    /**
+     * 真正的父类
+     */
+    private ViewGroup mParent;
 
-    private final RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-
-    public MultiStatusLayout(Context context) {
-        this(context, null);
-    }
-
-    public MultiStatusLayout(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
-    }
-
-    public MultiStatusLayout(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
+    public MultiStatusHelper(Context context, AttributeSet attrs, int defStyleAttr,ViewGroup viewGroup){
         mContext = context;
+        mParent = viewGroup;
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.MultiStatusLayout, defStyleAttr, 0);
         mNetErrorLayout = array.getResourceId(R.styleable.MultiStatusLayout_netErrorLayout, mNetErrorLayout);
         mLoadingLayout = array.getResourceId(R.styleable.MultiStatusLayout_loadingLayout, mLoadingLayout);
@@ -93,27 +83,73 @@ public class MultiStatusLayout extends RelativeLayout {
     /**
      * 显示此View,如果view==null的时候才去加载这个布局
      *
-     * @param layoutId 布局id
-     * @param index 存放布局容器中的索引
+     * @param layoutId 布局索引
+     * @param index    存放view容器中的索引
      */
     private void showView(int layoutId, int index) {
         //如果子控件处于显示状态先隐藏所有的子控件
         hideViews();
         View view = mContentViews[index];
-        if (view==null){
-            view = inflateAndAddViewInLayout(null,index,layoutId);
-        }else {
+        if (view == null) {
+            view = inflateAndAddViewInLayout(null, index, layoutId);
+        } else {
             view.setVisibility(VISIBLE);
         }
         //设置网络错误或者数据错误布局的点击事件
         if (index == 2 || index == 4) {
-            view.setOnClickListener(new OnClickListener() {
+            view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (onReloadDataListener != null) onReloadDataListener.reloadData();
                 }
             });
         }
+    }
+
+    /**
+     * 在View id 为mTargetViewId 下方添加其他状态的view
+     *
+     * @param view 不同状态下的view
+     */
+    private void addViewBlewTargetView(View view) {
+        if (mParent instanceof ConstraintLayout){
+            ConstraintLayout constraintLayout = (ConstraintLayout) mParent;
+            ConstraintSet constraintSet = new ConstraintSet();
+            constraintLayout.addView(view);
+            constraintSet.clone(constraintLayout);
+            constraintSet.constrainWidth(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
+            constraintSet.constrainHeight(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
+            constraintSet.connect(view.getId(), ConstraintSet.TOP, mTargetViewId == -999 ? ConstraintSet.PARENT_ID : mTargetViewId, ConstraintSet.TOP);
+            constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+            constraintSet.connect(view.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+            constraintSet.connect(view.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+            constraintSet.applyTo(constraintLayout);
+        }else if (mParent instanceof RelativeLayout){
+            RelativeLayout relativeLayout = (RelativeLayout) mParent;
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+            if (mTargetViewId != -999) {
+                layoutParams.addRule(RelativeLayout.BELOW, mTargetViewId);
+            }
+            relativeLayout.addView(view, layoutParams);
+        }
+
+    }
+
+
+    /**
+     * 加载相应状态的布局，并且添加至ViewGroup中
+     *
+     * @param index       存放布局容器的索引
+     * @param layoutResId 布局资源id
+     * @return 返回相应状态的布局
+     */
+    private View inflateAndAddViewInLayout(View view, int index, int layoutResId) {
+        if (view == null) {
+            view = ViewGroup.inflate(mContext, layoutResId, null);
+            addViewBlewTargetView(view);
+            mContentViews[index] = view;
+        }
+        return view;
     }
 
 
@@ -125,7 +161,7 @@ public class MultiStatusLayout extends RelativeLayout {
             return;
         mViewType = 0;
         //显示加载中的布局
-        showView(mOtherLayout,0);
+        showView(mOtherLayout, 0);
     }
 
     /**
@@ -175,9 +211,9 @@ public class MultiStatusLayout extends RelativeLayout {
      * 隐藏所有的View
      */
     private void hideViews() {
-        int count= getChildCount();
+        int count = mParent.getChildCount();
         for (int i = 0; i < count; i++) {
-            View view = getChildAt(i);
+            View view = mParent.getChildAt(i);
             if (mTargetViewId != view.getId() && view.getVisibility() != GONE && !(view instanceof ViewStub)) {
                 view.setVisibility(GONE);
             }
@@ -192,25 +228,30 @@ public class MultiStatusLayout extends RelativeLayout {
         if (mViewType == 5)
             return;
         mViewType = 5;
-        int count = getChildCount();
+        int count = mParent.getChildCount();
         for (int i = 0; i < count; i++) {
-            View view = getChildAt(i);
-            view.setVisibility(VISIBLE);
+            View view = mParent.getChildAt(i);
+            if (!(view instanceof ViewStub)) {
+                view.setVisibility(VISIBLE);
+            } else {
+                view.setVisibility(GONE);
+            }
         }
-        for (View view:mContentViews){
-            if (view!=null)
-            view.setVisibility(GONE);
+        for (View view : mContentViews) {
+            if (view != null)
+                view.setVisibility(GONE);
         }
     }
 
 
     /**
      * 获取扩展布局
+     *
      * @return 扩展布局
      */
     public View getOtherView() {
         View view = mContentViews[0];
-        return inflateAndAddViewInLayout(view,0,mOtherLayout);
+        return inflateAndAddViewInLayout(view, 0, mOtherLayout);
     }
 
     /**
@@ -220,7 +261,7 @@ public class MultiStatusLayout extends RelativeLayout {
      */
     public View getLoadingView() {
         View view = mContentViews[1];
-        return inflateAndAddViewInLayout(view,1,mLoadingLayout);
+        return inflateAndAddViewInLayout(view, 1, mLoadingLayout);
     }
 
     /**
@@ -230,7 +271,7 @@ public class MultiStatusLayout extends RelativeLayout {
      */
     public View getNetErrorView() {
         View view = mContentViews[2];
-        return inflateAndAddViewInLayout(view,2,mNetErrorLayout);
+        return inflateAndAddViewInLayout(view, 2, mNetErrorLayout);
     }
 
     /**
@@ -240,7 +281,7 @@ public class MultiStatusLayout extends RelativeLayout {
      */
     public View getEmptyView() {
         View view = mContentViews[3];
-        return inflateAndAddViewInLayout(view,3,mEmptyLayout);
+        return inflateAndAddViewInLayout(view, 3, mEmptyLayout);
     }
 
     /**
@@ -250,90 +291,85 @@ public class MultiStatusLayout extends RelativeLayout {
      */
     public View getErrorView() {
         View view = mContentViews[4];
-        return inflateAndAddViewInLayout(view,4,mErrorLayout);
+        return inflateAndAddViewInLayout(view, 4, mErrorLayout);
     }
 
     /**
      * 设置扩展布局的view
+     *
      * @param layoutResId 布局资源id
      */
-    public void setOtherView(int layoutResId){
+    public void setOtherView(int layoutResId) {
         mOtherLayout = layoutResId;
-        inflateAndAddViewInLayout(null,0,layoutResId);
+        inflateAndAddViewInLayout(null, 0, layoutResId);
     }
 
     /**
      * 设置扩展布局的view
+     *
      * @param layoutResId 布局资源id
      */
-    public void setLoadingView(int layoutResId){
+    public void setLoadingView(int layoutResId) {
         mLoadingLayout = layoutResId;
-        inflateAndAddViewInLayout(null,1,layoutResId);
+        inflateAndAddViewInLayout(null, 1, layoutResId);
     }
 
     /**
      * 设置扩展布局的view
+     *
      * @param layoutResId 布局资源id
      */
-    public void setNetErrorView(int layoutResId){
+    public void setNetErrorView(int layoutResId) {
         mNetErrorLayout = layoutResId;
-        inflateAndAddViewInLayout(null,2,layoutResId);
+        inflateAndAddViewInLayout(null, 2, layoutResId);
     }
 
     /**
      * 设置扩展布局的view
+     *
      * @param layoutResId 布局资源id
      */
-    public void setEmptyView(int layoutResId){
+    public void setEmptyView(int layoutResId) {
         mEmptyLayout = layoutResId;
-        inflateAndAddViewInLayout(null,3,layoutResId);
+        inflateAndAddViewInLayout(null, 3, layoutResId);
     }
 
     /**
      * 设置扩展布局的view
+     *
      * @param layoutResId 布局资源id
      */
-    public void setErrorView(int layoutResId){
+    public void setErrorView(int layoutResId) {
         mErrorLayout = layoutResId;
-        inflateAndAddViewInLayout(null,4,layoutResId);
+        inflateAndAddViewInLayout(null, 4, layoutResId);
+    }
+
+    public int getTargetViewId(){
+        return mTargetViewId;
     }
 
     /**
      * 设置不隐藏的view id
+     *
      * @param targetViewId 不隐藏的view id
      */
-    public void setTargetViewId(int targetViewId){
+    public void setTargetViewId(int targetViewId) {
         mTargetViewId = targetViewId;
     }
 
-    /**
-     * 加载相应状态的布局，并且添加至ViewGroup中
-     * @param index 存放布局容器的索引
-     * @param layoutResId 布局资源id
-     * @return 返回相应状态的布局
-     */
-    private View inflateAndAddViewInLayout(View view,int index,int layoutResId){
-        if (view == null) {
-            view = inflate(mContext, layoutResId, null);
-            if (mTargetViewId != -999) {
-                layoutParams.addRule(RelativeLayout.BELOW, mTargetViewId);
-            }
-            addView(view, layoutParams);
-            mContentViews[index] = view;
-        }
-        return view;
-    }
+
     /**
      * 获取当前显示的布局
-     *  0：other
-     *  1：loading
-     *  2：net_error
-     *  3：empty
-     *  4：error
-     *  5：content
-     * @return 返回当前界面显示的状态
+     * 1：other
+     * 2：loading
+     * 3：net_error
+     * 4：empty
+     * 5：error
+     * 6：content
+     *
+     * @return
      */
-    public int getShowViewType(){
+    public int getShowViewType() {
         return mViewType;
     }
 
@@ -344,6 +380,4 @@ public class MultiStatusLayout extends RelativeLayout {
     public void setOnReloadDataListener(final OnReloadDataListener onReloadDataListener) {
         this.onReloadDataListener = onReloadDataListener;
     }
-
-
 }
