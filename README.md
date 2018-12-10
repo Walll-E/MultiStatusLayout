@@ -15,7 +15,8 @@ allprojects {
     
     
 dependencies {
-        implementation 'com.github.Walll-E:MultiStatusLayout:v1.0.3'
+        implementation 'com.github.Walll-E:MultiStatusLayout:library:v1.0.3'
+        annotationProcessor 'com.github.Walll-E:MultiStatusLayout:compiler:v1.0.3'
     }
 ```
 
