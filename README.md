@@ -15,8 +15,8 @@ allprojects {
     
     
 dependencies {
-        implementation 'com.github.Walll-E:MultiStatusLayout:library:v1.0.3'
-        annotationProcessor 'com.github.Walll-E:MultiStatusLayout:compiler:v1.0.3'
+        implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.4'
+        annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.4'
     }
 ```
 
@@ -56,6 +56,9 @@ dependencies {
         app:emptyLayout="@layout/empty_layout"
         app:errorLayout="@layout/error_layout"
         app:netErrorLayout="@layout/net_error_layout"
+        app:targetViewId="@+id/rl_title"
+        app:netErrorReloadViewId="@id/tv_netError"
+        app:errorReloadViewId="@id/tv_error"
         tools:context="com.example.wall_e.multistatuslayout.MainActivity">
 
         <TextView
