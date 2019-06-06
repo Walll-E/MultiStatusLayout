@@ -2,7 +2,12 @@
 可自由的加载多种状态的视图，并且只有要显示的时候才会去加载相应的布局文件。这样无需加载使用不到的布局文件，提升了页面加载的性能。
 分别继承自`ConstraintLayout`、`Relativelayout`可以作为最外层的布局，支持在布局文件中指定不同状态下的布局。如果感兴趣，可以下载Demo具体看用法
 
-> `MultiStatusConstraintLayout`在布局文件中的每一个子View都要添加id且必须在loadingLayout、emptyLayout、otherLayout、netErrorLayout、errorLayout的布局文件中的根`ViewGroup`下添加id，不然会抛异常`throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");`
+### `MultiStatusConstraintLayout`在布局文件中的每一个子View都要添加id且必须在loadingLayout、emptyLayout、otherLayout、netErrorLayout、errorLayout的布局文件中的根`ViewGroup`下添加id，不然会抛异常`throw new RuntimeException("All children of ConstraintLayout must have ids to use ConstraintSet");`
+
+### 新增xml属性如下
+- `targetViewId`：表示在任何情况下都不隐藏的View的id
+- `netErrorReloadViewId`：表示网络错误布局显示，重试View的id，如果不设置，重试事件的监听直接设置在netErrorLayout上
+- `errorReloadViewId`：表示数据错误，重试View的id，如果不设置，重试事件的监听直接设置在errorLayout上
 
 ### Gradle集成
 ```
@@ -25,10 +30,12 @@ dependencies {
 |:-----:|:-------:|
 |loadingLayout  | 加载中的布局 |
 |emptyLayout | 数据为空时的布局|
-|netErrorLayout| 网络错误时的布局 |
-|errorLayout|加载失败时的布局|
-|otherLayout|扩充的布局|
-|targetViewId|子控件中任何时候都显示的控件id|
+|netErrorLayout | 网络错误时的布局 |
+|errorLayout | 加载失败时的布局 |
+|otherLayout | 扩充的布局 |
+|targetViewId | 子控件中任何时候都显示的控件id |
+|netErrorReloadViewId | 网络错误重试按钮id |
+|errorReloadViewId | 加载失败重试按钮id |
 
 ### 提供方法
 | 方法   |  作用  |
