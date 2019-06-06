@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.wall_e.multiStatusLayout.MultiStatusLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/statusLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     app:loadingLayout="@layout/common_loading"
     app:netErrorLayout="@layout/common_net_error"
-    android:id="@+id/statusLayout"
-    android:layout_height="match_parent"
+    app:netErrorReloadViewId="@id/tv_netError"
     tools:context=".NetErrorFragment">
 
 

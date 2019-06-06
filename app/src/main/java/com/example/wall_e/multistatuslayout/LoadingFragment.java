@@ -39,20 +39,19 @@ public class LoadingFragment extends BaseFragment {
     };
 
 
-
-    private MultiStatusLayout statusLayout;
     private RecyclerView recyclerView;
-    private boolean hasLoadFinish;
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_loading, container, false);
-        statusLayout = view.findViewById(R.id.statusLayout);
-        recyclerView = view.findViewById(R.id.recyclerView);
-        isPrepared = true;
-        lazyLoad();
-        return view;
+    protected int getLayoutId() {
+        return R.layout.fragment_loading;
+    }
+
+    @Override
+    protected void initView() {
+        recyclerView = mView.findViewById(R.id.recyclerView);
+        statusLayout.showLoading();
+        handler.sendEmptyMessageDelayed(1, 2000);
     }
 
     private void setAdapter() {
@@ -60,21 +59,11 @@ public class LoadingFragment extends BaseFragment {
         for (int i = 0; i < 10; i++) {
             items.add("Wall-E");
         }
-        recyclerView.setAdapter(new CommonAdapter<String>(this.getContext(),R.layout.item,items) {
+        recyclerView.setAdapter(new CommonAdapter<String>(this.getContext(), R.layout.item, items) {
             @Override
             protected void convert(ViewHolder holder, String o, int position) {
-                holder.setText(R.id.tv_name,o);
+                holder.setText(R.id.tv_name, o);
             }
         });
-    }
-
-    @Override
-    protected void lazyLoad() {
-        if (!isVisible || !isPrepared || hasLoadFinish){
-            return;
-        }
-        hasLoadFinish = true;
-        statusLayout.showLoading();
-        handler.sendEmptyMessageDelayed(1, 2000);
     }
 }

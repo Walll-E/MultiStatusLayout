@@ -48,7 +48,23 @@ public class MultiStatusHelper {
     /**
      * 布局中的不隐藏的View的id
      */
-    private int mTargetViewId = -999;
+    private int mTargetViewId = View.NO_ID;
+    /**
+     * 服务端错误重试按钮id
+     */
+    private int mErrorReloadViewId = View.NO_ID;
+    /**
+     * 是否已经添加加载数据失败重试点击事件
+     */
+    private boolean isAddErrorClickEvent;
+    /**
+     * 网络错误重试按钮id
+     */
+    private int mNetErrorReloadViewId = View.NO_ID;
+    /**
+     * 是否已经添加网络错误重试点击事件
+     */
+    private boolean isAddNetErrorClickEvent;
 
     /**
      * 重新加载的监听
@@ -66,7 +82,7 @@ public class MultiStatusHelper {
      */
     private ViewGroup mParent;
 
-    public MultiStatusHelper(Context context, AttributeSet attrs, int defStyleAttr,ViewGroup viewGroup){
+    public MultiStatusHelper(Context context, AttributeSet attrs, int defStyleAttr, ViewGroup viewGroup) {
         mContext = context;
         mParent = viewGroup;
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.MultiStatusLayout, defStyleAttr, 0);
@@ -76,6 +92,8 @@ public class MultiStatusHelper {
         mEmptyLayout = array.getResourceId(R.styleable.MultiStatusLayout_emptyLayout, mEmptyLayout);
         mOtherLayout = array.getResourceId(R.styleable.MultiStatusLayout_otherLayout, mOtherLayout);
         mTargetViewId = array.getResourceId(R.styleable.MultiStatusLayout_targetViewId, mTargetViewId);
+        mNetErrorReloadViewId = array.getResourceId(R.styleable.MultiStatusLayout_netErrorReloadViewId, mNetErrorReloadViewId);
+        mErrorReloadViewId = array.getResourceId(R.styleable.MultiStatusLayout_errorReloadViewId, mErrorReloadViewId);
         array.recycle();
     }
 
@@ -96,14 +114,34 @@ public class MultiStatusHelper {
             view.setVisibility(VISIBLE);
         }
         //设置网络错误或者数据错误布局的点击事件
-        if (index == 2 || index == 4) {
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (onReloadDataListener != null) onReloadDataListener.reloadData();
+        switch (index) {
+            case 2://网络错误
+                if (!isAddNetErrorClickEvent) {
+                    setReloadClick(view, mNetErrorReloadViewId);
+                    isAddNetErrorClickEvent = true;
                 }
-            });
+                break;
+            case 4://数据加载失败
+                if (!isAddErrorClickEvent) {
+                    setReloadClick(view, mErrorReloadViewId);
+                    isAddErrorClickEvent = true;
+                }
+                break;
         }
+    }
+
+
+    private void setReloadClick(View view, int viewId) {
+        View clickView = view.findViewById(viewId);
+        if (clickView == null) {
+            clickView = view;
+        }
+        clickView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onReloadDataListener != null) onReloadDataListener.reloadData();
+            }
+        });
     }
 
     /**
@@ -112,27 +150,26 @@ public class MultiStatusHelper {
      * @param view 不同状态下的view
      */
     private void addViewBlewTargetView(View view) {
-        if (mParent instanceof ConstraintLayout){
+        if (mParent instanceof ConstraintLayout) {
             ConstraintLayout constraintLayout = (ConstraintLayout) mParent;
             ConstraintSet constraintSet = new ConstraintSet();
             constraintLayout.addView(view);
             constraintSet.clone(constraintLayout);
             constraintSet.constrainWidth(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
             constraintSet.constrainHeight(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
-            constraintSet.connect(view.getId(), ConstraintSet.TOP, mTargetViewId == -999 ? ConstraintSet.PARENT_ID : mTargetViewId, ConstraintSet.TOP);
+            constraintSet.connect(view.getId(), ConstraintSet.TOP, mTargetViewId == View.NO_ID ? ConstraintSet.PARENT_ID : mTargetViewId, ConstraintSet.TOP);
             constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
             constraintSet.connect(view.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(view.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
             constraintSet.applyTo(constraintLayout);
-        }else if (mParent instanceof RelativeLayout){
+        } else if (mParent instanceof RelativeLayout) {
             RelativeLayout relativeLayout = (RelativeLayout) mParent;
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
-            if (mTargetViewId != -999) {
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            if (mTargetViewId != View.NO_ID) {
                 layoutParams.addRule(RelativeLayout.BELOW, mTargetViewId);
             }
             relativeLayout.addView(view, layoutParams);
         }
-
     }
 
 
@@ -344,7 +381,7 @@ public class MultiStatusHelper {
         inflateAndAddViewInLayout(null, 4, layoutResId);
     }
 
-    public int getTargetViewId(){
+    public int getTargetViewId() {
         return mTargetViewId;
     }
 

@@ -1,15 +1,9 @@
 package com.example.wall_e.multistatuslayout;
 
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.wall_e.multiStatusLayout.MultiStatusLayout;
 
 
 /**
@@ -25,25 +19,15 @@ public class EmptyFragment extends BaseFragment {
             statusLayout.showEmpty();
         }
     };
-    MultiStatusLayout statusLayout;
-    private boolean hasLoadFinish;
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_empty, container, false);
-        statusLayout = view.findViewById(R.id.statusLayout);
-        isPrepared =true;
-        lazyLoad();
-        return view;
+    protected int getLayoutId() {
+        return R.layout.fragment_empty;
     }
 
     @Override
-    protected void lazyLoad() {
-        if (!isPrepared || !isVisible || hasLoadFinish)
-            return;
-        hasLoadFinish = true;
+    protected void initView() {
         statusLayout.showLoading();
         handler.sendEmptyMessageDelayed(1, 2000);
     }

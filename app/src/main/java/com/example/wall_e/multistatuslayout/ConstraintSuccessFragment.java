@@ -1,16 +1,8 @@
 package com.example.wall_e.multistatuslayout;
 
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.wall_e.multiStatusLayout.MultiStatusConstraintLayout;
 import com.zhy.adapter.recyclerview.CommonAdapter;
 import com.zhy.adapter.recyclerview.base.ViewHolder;
 
@@ -31,18 +23,19 @@ public class ConstraintSuccessFragment extends BaseFragment {
 
 
 
-    private MultiStatusConstraintLayout statusLayout;
     private RecyclerView recyclerView;
-    private boolean hasLoadFinish;
-    @Nullable
+
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_constraint_loading, container, false);
-        statusLayout = view.findViewById(R.id.statusLayout);
-        recyclerView = view.findViewById(R.id.recyclerView);
-        isPrepared = true;
-        lazyLoad();
-        return view;
+    protected int getLayoutId() {
+        return R.layout.fragment_constraint_loading;
+    }
+
+    @Override
+    protected void initView() {
+        recyclerView = mView.findViewById(R.id.recyclerView);
+        statusLayout.showLoading();
+        handler.sendEmptyMessageDelayed(1, 2000);
     }
 
 
@@ -59,11 +52,4 @@ public class ConstraintSuccessFragment extends BaseFragment {
         });
     }
 
-    @Override
-    protected void lazyLoad() {
-        if (!isPrepared || !isVisible || hasLoadFinish)return;
-        hasLoadFinish = true;
-        statusLayout.showLoading();
-        handler.sendEmptyMessageDelayed(1, 2000);
-    }
 }

@@ -31,25 +31,16 @@ public class ConstraintNetErrorFragment extends BaseFragment {
             statusLayout.showNetError();
         }
     };
-    MultiStatusConstraintLayout statusLayout;
-    private boolean hasLoadFinish;
+
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_constraint_net_error, container, false);
-        statusLayout = view.findViewById(R.id.statusLayout);
-        isPrepared = true;
-        lazyLoad();
-        return view;
+    protected int getLayoutId() {
+        return R.layout.fragment_constraint_net_error;
     }
 
     @Override
-    protected void lazyLoad() {
-        if (!isPrepared || !isVisible || hasLoadFinish)return;
-        hasLoadFinish = true;
+    protected void initView() {
         statusLayout.showLoading();
         statusLayout.setOnReloadDataListener(() -> {
             statusLayout.showLoading();
@@ -57,4 +48,5 @@ public class ConstraintNetErrorFragment extends BaseFragment {
         });
         handler.sendEmptyMessageDelayed(1, 2000);
     }
+
 }

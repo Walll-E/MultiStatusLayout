@@ -7,5 +7,7 @@
         <attr name="errorLayout" format="reference" />
         <attr name="otherLayout" format="reference" />
         <attr name="targetViewId" format="reference" />
+        <attr name="netErrorReloadViewId" format="reference"/>
+        <attr name="errorReloadViewId" format="reference"/>
     </declare-styleable>
 </resources>
