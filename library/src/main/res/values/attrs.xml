@@ -9,5 +9,11 @@
         <attr name="targetViewId" format="reference" />
         <attr name="netErrorReloadViewId" format="reference"/>
         <attr name="errorReloadViewId" format="reference"/>
+        <attr name="contentReferenceIds" format="string"/>
+        <attr name="emptyReferenceIds" format="string"/>
+        <attr name="errorReferenceIds" format="string"/>
+        <attr name="netErrorReferenceIds" format="string"/>
+        <attr name="otherReferenceIds" format="string"/>
+        <attr name="loadingReferenceIds" format="string"/>
     </declare-styleable>
 </resources>
