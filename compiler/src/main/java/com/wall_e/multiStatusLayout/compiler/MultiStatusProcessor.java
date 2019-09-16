@@ -155,6 +155,14 @@ public class MultiStatusProcessor extends AbstractProcessor {
         getTargetViewId(builder);
         getShowViewType(builder);
         setOnReloadDataListener(builder);
+        setErrorReloadViewId(builder);
+        setNetErrorReloadViewId(builder);
+        setOnContentReferenceIdsAction(builder);
+        setOnEmptyReferenceIdsAction(builder);
+        setOnErrorReferenceIdsAction(builder);
+        setOnOtherReferenceIdsAction(builder);
+        setOnLoadingReferenceIdsAction(builder);
+        setOnNetErrorReferenceIdsAction(builder);
     }
 
     private void setOnReloadDataListener(TypeSpec.Builder builder) {
@@ -166,6 +174,67 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .build();
         builder.addMethod(methodSpec);
     }
+
+    private void setOnContentReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnContentReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnContentReferenceIdsAction"),"onContentReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnContentReferenceIdsAction(onContentReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setOnOtherReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnOtherReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnOtherReferenceIdsAction"),"onOtherReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnOtherReferenceIdsAction(onOtherReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setOnEmptyReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnEmptyReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnEmptyReferenceIdsAction"),"onEmptyReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnEmptyReferenceIdsAction(onEmptyReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setOnErrorReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnErrorReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnErrorReferenceIdsAction"),"onErrorReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnErrorReferenceIdsAction(onErrorReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setOnNetErrorReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnNetErrorReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnNetErrorReferenceIdsAction"),"onNetErrorReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnNetErrorReferenceIdsAction(onNetErrorReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setOnLoadingReferenceIdsAction(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setOnLoadingReferenceIdsAction")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME,"OnLoadingReferenceIdsAction"),"onLoadingReferenceIdsAction")
+                .addStatement("mMultiStatusHelper.setOnLoadingReferenceIdsAction(onLoadingReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
 
     private void getShowViewType(TypeSpec.Builder builder) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("getShowViewType")
@@ -194,6 +263,27 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(TypeName.INT,"viewId")
                 .addStatement("mMultiStatusHelper.setTargetViewId(viewId)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+    private void setNetErrorReloadViewId(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setNetErrorReloadViewId")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(TypeName.INT,"netErrorReloadViewId")
+                .addStatement("mMultiStatusHelper.setNetErrorReloadViewId(netErrorReloadViewId)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+
+    private void setErrorReloadViewId(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setErrorReloadViewId")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(TypeName.INT,"errorReloadViewId")
+                .addStatement("mMultiStatusHelper.setErrorReloadViewId(errorReloadViewId)")
                 .build();
         builder.addMethod(methodSpec);
     }

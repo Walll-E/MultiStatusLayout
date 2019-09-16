@@ -2,6 +2,13 @@ package com.wall_e.multiStatusLayout;
 
 import android.view.View;
 
+import com.wall_e.multiStatusLayout.interf.OnContentReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnEmptyReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnErrorReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnLoadingReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnNetErrorReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnOtherReferenceIdsAction;
+
 public interface MultiStatusEvent {
 
     void showOther();
@@ -43,5 +50,21 @@ public interface MultiStatusEvent {
     int getShowViewType();
 
     void setOnReloadDataListener(final OnReloadDataListener onReloadDataListener);
+
+    void setNetErrorReloadViewId(int netErrorReloadViewId);
+
+    void setErrorReloadViewId(int errorReloadViewId);
+
+    void setOnContentReferenceIdsAction(OnContentReferenceIdsAction onContentReferenceIdsAction);
+
+    void setOnOtherReferenceIdsAction(OnOtherReferenceIdsAction onOtherReferenceIdsAction);
+
+    void setOnEmptyReferenceIdsAction(OnEmptyReferenceIdsAction onEmptyReferenceIdsAction);
+
+    void setOnErrorReferenceIdsAction(OnErrorReferenceIdsAction onErrorReferenceIdsAction);
+
+    void setOnNetErrorReferenceIdsAction(OnNetErrorReferenceIdsAction onNetErrorReferenceIdsAction);
+
+    void setOnLoadingReferenceIdsAction(OnLoadingReferenceIdsAction onLoadingReferenceIdsAction);
 
 }

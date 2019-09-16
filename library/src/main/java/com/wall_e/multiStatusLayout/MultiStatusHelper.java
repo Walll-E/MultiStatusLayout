@@ -131,7 +131,7 @@ public class MultiStatusHelper {
     /**
      * 存储每一个类型的引用id集合
      */
-    private Map<Integer,List<Integer>> mReferenceIds;
+    private Map<Integer, List<Integer>> mReferenceIds;
 
     /**
      * 真正的父类
@@ -154,31 +154,31 @@ public class MultiStatusHelper {
         mTargetViewId = array.getResourceId(R.styleable.MultiStatusLayout_targetViewId, mTargetViewId);
         mNetErrorReloadViewId = array.getResourceId(R.styleable.MultiStatusLayout_netErrorReloadViewId, mNetErrorReloadViewId);
         mErrorReloadViewId = array.getResourceId(R.styleable.MultiStatusLayout_errorReloadViewId, mErrorReloadViewId);
-        setIds(array.getString(R.styleable.MultiStatusLayout_contentReferenceIds),CONTENT_TYPE);
-        setIds(array.getString(R.styleable.MultiStatusLayout_emptyReferenceIds),EMPTY_TYPE);
-        setIds(array.getString(R.styleable.MultiStatusLayout_errorReferenceIds),ERROR_TYPE);
-        setIds(array.getString(R.styleable.MultiStatusLayout_netErrorReferenceIds),NET_ERROR_TYPE);
-        setIds(array.getString(R.styleable.MultiStatusLayout_loadingReferenceIds),LOADING_TYPE);
-        setIds(array.getString(R.styleable.MultiStatusLayout_otherReferenceIds),OTHER_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_contentReferenceIds), CONTENT_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_emptyReferenceIds), EMPTY_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_errorReferenceIds), ERROR_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_netErrorReferenceIds), NET_ERROR_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_loadingReferenceIds), LOADING_TYPE);
+        setIds(array.getString(R.styleable.MultiStatusLayout_otherReferenceIds), OTHER_TYPE);
         array.recycle();
     }
 
 
-    private void setIds(String referenceIds,int type) {
+    private void setIds(String referenceIds, int type) {
         if (referenceIds == null) return;
         int begin = 0;
         while (true) {
             int end = referenceIds.indexOf(",", begin);
             if (end == -1) {
-                addId(referenceIds.substring(begin),type);
+                addId(referenceIds.substring(begin), type);
                 return;
             }
-            addId(referenceIds.substring(begin, end),type);
+            addId(referenceIds.substring(begin, end), type);
             begin = end + 1;
         }
     }
 
-    private void addId(String idString,int type) {
+    private void addId(String idString, int type) {
         if (idString == null || mContext == null) return;
         idString = idString.trim();
         int tag = 0;
@@ -199,21 +199,20 @@ public class MultiStatusHelper {
         if (mReferenceIds == null) {
             mReferenceIds = new ArrayMap<>();
         }
-        if (mReferenceIds.containsKey(type)){
+        if (mReferenceIds.containsKey(type)) {
             List<Integer> list = mReferenceIds.get(type);
-            if (list!=null && !list.contains(tag)){
+            if (list != null && !list.contains(tag)) {
                 list.add(tag);
             }
-        }else {
+        } else {
             List<Integer> list = new ArrayList<>();
             list.add(tag);
-            mReferenceIds.put(type,list);
+            mReferenceIds.put(type, list);
         }
     }
 
 
     /**
-     *
      * @param type 0:Other下面限制的ids
      *             1:Loading下面限制的ids
      *             2:NetError下面限制的ids
@@ -223,8 +222,8 @@ public class MultiStatusHelper {
      * @return 返回相对应下的ids
      */
     @Nullable
-    public List<Integer> getReferenceIds(@IntRange(from = 0,to = 5) int type) {
-        if (mReferenceIds==null)return null;
+    public List<Integer> getReferenceIds(@IntRange(from = 0, to = 5) int type) {
+        if (mReferenceIds == null) return null;
         return mReferenceIds.get(type);
     }
 
@@ -233,13 +232,13 @@ public class MultiStatusHelper {
      * 显示此View,如果view==null的时候才去加载这个布局
      *
      * @param layoutId 布局索引
-     * @param type    存放view容器中的索引
+     * @param type     存放view容器中的索引
      */
     private void showView(int layoutId, int type) {
         //如果子控件处于显示状态先隐藏所有的子控件
         hideViews(type);
         View view = inflateAndAddViewInLayout(type, layoutId);
-        if (view.getVisibility()!= VISIBLE){
+        if (view.getVisibility() != VISIBLE) {
             view.setVisibility(VISIBLE);
         }
         //设置网络错误或者数据错误布局的点击事件
@@ -269,17 +268,15 @@ public class MultiStatusHelper {
     private View inflateAndAddViewInLayout(int index, int layoutResId) {
         int realIndex = mRealIndex.get(index, -1);
         View view;
-        if (realIndex==-1){
+        if (realIndex == -1) {
             view = ViewGroup.inflate(mContext, layoutResId, null);
             addViewBlewTargetView(view);
-            mRealIndex.put(index,mParent.getChildCount()-1);
-        }else {
+            mRealIndex.put(index, mParent.getChildCount() - 1);
+        } else {
             view = mParent.getChildAt(realIndex);
         }
         return view;
     }
-
-
 
 
     private void setReloadClick(View view, int viewId) {
@@ -322,10 +319,6 @@ public class MultiStatusHelper {
             relativeLayout.addView(view, layoutParams);
         }
     }
-
-
-
-
 
 
     /**
@@ -384,56 +377,57 @@ public class MultiStatusHelper {
 
     /**
      * 按需隐藏相关的View
+     *
      * @param type
      */
     private void hideViews(int type) {
         int count = mParent.getChildCount();
         List<Integer> referenceIds = null;
-        if (mReferenceIds!=null){
+        if (mReferenceIds != null) {
             referenceIds = mReferenceIds.get(type);
         }
         int realIndex = mRealIndex.get(type, -1);
-        type = isCollectionEmpty(referenceIds)?-1:type;
+        type = isCollectionEmpty(referenceIds) ? -1 : type;
         List<View> views;
-        switch (type){
+        switch (type) {
             case OTHER_TYPE:
-                views = accordingToTypeShow(realIndex,referenceIds);
-                if (mOnOtherReferenceIdsAction!=null){
+                views = accordingToTypeShow(realIndex, referenceIds);
+                if (mOnOtherReferenceIdsAction != null) {
                     mOnOtherReferenceIdsAction.showOtherAction(views);
                 }
                 break;
             case LOADING_TYPE:
-                views = accordingToTypeShow(realIndex,referenceIds);
-                if (mOnLoadingReferenceIdsAction!=null){
+                views = accordingToTypeShow(realIndex, referenceIds);
+                if (mOnLoadingReferenceIdsAction != null) {
                     mOnLoadingReferenceIdsAction.showLoadingAction(views);
                 }
                 break;
             case EMPTY_TYPE:
-                views = accordingToTypeShow(realIndex,referenceIds);
-                if (mOnEmptyReferenceIdsAction!=null){
+                views = accordingToTypeShow(realIndex, referenceIds);
+                if (mOnEmptyReferenceIdsAction != null) {
                     mOnEmptyReferenceIdsAction.showEmptyAction(views);
                 }
                 break;
             case ERROR_TYPE:
                 views = accordingToTypeShow(realIndex, referenceIds);
-                if (mOnErrorReferenceIdsAction!=null){
+                if (mOnErrorReferenceIdsAction != null) {
                     mOnErrorReferenceIdsAction.showErrorAction(views);
                 }
                 break;
             case NET_ERROR_TYPE:
                 views = accordingToTypeShow(realIndex, referenceIds);
-                if (mOnNetErrorReferenceIdsAction!=null){
+                if (mOnNetErrorReferenceIdsAction != null) {
                     mOnNetErrorReferenceIdsAction.showNetErrorAction(views);
                 }
                 break;
             default:
                 for (int i = 0; i < count; i++) {
-                    if (i==realIndex)continue;
+                    if (i == realIndex) continue;
                     View view = mParent.getChildAt(i);
                     if (mTargetViewId != view.getId()
                             && view.getVisibility() != GONE
                             && !(view instanceof ViewStub)
-                            ) {
+                    ) {
                         view.setVisibility(GONE);
                     }
                 }
@@ -441,14 +435,14 @@ public class MultiStatusHelper {
         }
     }
 
-    private List<View> accordingToTypeShow(int realIndex,List<Integer> referenceIds){
+    private List<View> accordingToTypeShow(int realIndex, List<Integer> referenceIds) {
         List<View> views = new ArrayList<>();
         int childCount = mParent.getChildCount();
         for (int i = 0; i < childCount; i++) {
-            if (i==realIndex)continue;
+            if (i == realIndex) continue;
             View view = mParent.getChildAt(i);
             int id = view.getId();
-            if (referenceIds.contains(id)){
+            if (referenceIds.contains(id)) {
                 views.add(view);
                 continue;
             }
@@ -461,8 +455,8 @@ public class MultiStatusHelper {
         return views;
     }
 
-    private boolean isCollectionEmpty(Collection e){
-        return e==null || e.isEmpty();
+    private boolean isCollectionEmpty(Collection e) {
+        return e == null || e.isEmpty();
     }
 
 
@@ -475,23 +469,32 @@ public class MultiStatusHelper {
         mViewType = CONTENT_TYPE;
         int count = mParent.getChildCount();
         int size = mRealIndex.size();
-        count-=size;
+        count -= size;
         List<Integer> contentIds = null;
-        if (mReferenceIds!=null){
+        List<View> contentView = null;
+        if (mReferenceIds != null) {
             contentIds = mReferenceIds.get(CONTENT_TYPE);
         }
-        boolean hasContentAction = mOnContentReferenceIdsAction!=null;
+        if (contentIds != null) {
+            contentView = new ArrayList<>();
+        }
+        boolean hasContentAction = mOnContentReferenceIdsAction != null;
         for (int i = 0; i < count; i++) {
             View view = mParent.getChildAt(i);
+            if (contentIds != null && contentIds.contains(view.getId())) {
+                if (hasContentAction)
+                    contentView.add(view);
+                continue;
+            }
             if (!(view instanceof ViewStub)) {
                 view.setVisibility(VISIBLE);
             }
         }
-        for (int i = 0; i <size; i++) {
+        for (int i = 0; i < size; i++) {
             mParent.getChildAt(mRealIndex.valueAt(i)).setVisibility(GONE);
         }
-        if (hasContentAction){
-            mOnContentReferenceIdsAction.showContentAction(contentIds);
+        if (hasContentAction) {
+            mOnContentReferenceIdsAction.showContentAction(contentView);
         }
     }
 
@@ -502,7 +505,7 @@ public class MultiStatusHelper {
      * @return 扩展布局
      */
     public View getOtherView() {
-        return inflateAndAddViewInLayout( OTHER_TYPE, mOtherLayout);
+        return inflateAndAddViewInLayout(OTHER_TYPE, mOtherLayout);
     }
 
     /**
@@ -620,6 +623,23 @@ public class MultiStatusHelper {
         return mViewType;
     }
 
+    /**
+     * 设置网络错误点击重试View的Id
+     * @param netErrorReloadViewId
+     */
+    public void setNetErrorReloadViewId(int netErrorReloadViewId){
+        mNetErrorReloadViewId = netErrorReloadViewId;
+    }
+
+
+    /**
+     * 设置服务器错误点击重试View的Id
+     * @param errorReloadViewId
+     */
+    public void setErrorReloadViewId(int errorReloadViewId){
+        mErrorReloadViewId = errorReloadViewId;
+    }
+
 
     /**
      * 重新加载数据
@@ -628,27 +648,27 @@ public class MultiStatusHelper {
         this.onReloadDataListener = onReloadDataListener;
     }
 
-    public void setOnContentReferenceIdsAction(OnContentReferenceIdsAction onContentReferenceIdsAction){
+    public void setOnContentReferenceIdsAction(OnContentReferenceIdsAction onContentReferenceIdsAction) {
         this.mOnContentReferenceIdsAction = onContentReferenceIdsAction;
     }
 
-    public void setOnOtherReferenceIdsAction(OnOtherReferenceIdsAction onOtherReferenceIdsAction){
+    public void setOnOtherReferenceIdsAction(OnOtherReferenceIdsAction onOtherReferenceIdsAction) {
         this.mOnOtherReferenceIdsAction = onOtherReferenceIdsAction;
     }
 
-    public void setOnEmptyReferenceIdsAction(OnEmptyReferenceIdsAction onEmptyReferenceIdsAction){
+    public void setOnEmptyReferenceIdsAction(OnEmptyReferenceIdsAction onEmptyReferenceIdsAction) {
         this.mOnEmptyReferenceIdsAction = onEmptyReferenceIdsAction;
     }
 
-    public void setOnErrorReferenceIdsAction(OnErrorReferenceIdsAction onErrorReferenceIdsAction){
+    public void setOnErrorReferenceIdsAction(OnErrorReferenceIdsAction onErrorReferenceIdsAction) {
         this.mOnErrorReferenceIdsAction = onErrorReferenceIdsAction;
     }
 
-    public void setOnNetErrorReferenceIdsAction(OnNetErrorReferenceIdsAction onNetErrorReferenceIdsAction){
+    public void setOnNetErrorReferenceIdsAction(OnNetErrorReferenceIdsAction onNetErrorReferenceIdsAction) {
         this.mOnNetErrorReferenceIdsAction = onNetErrorReferenceIdsAction;
     }
 
-    public void setOnLoadingReferenceIdsAction(OnLoadingReferenceIdsAction onLoadingReferenceIdsAction){
+    public void setOnLoadingReferenceIdsAction(OnLoadingReferenceIdsAction onLoadingReferenceIdsAction) {
         this.mOnLoadingReferenceIdsAction = onLoadingReferenceIdsAction;
     }
 }
