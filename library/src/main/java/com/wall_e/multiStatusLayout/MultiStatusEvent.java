@@ -2,6 +2,7 @@ package com.wall_e.multiStatusLayout;
 
 import android.view.View;
 
+import com.wall_e.multiStatusLayout.annotation.ViewConstraintProvider;
 import com.wall_e.multiStatusLayout.interf.OnContentReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnEmptyReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnErrorReferenceIdsAction;
@@ -66,5 +67,7 @@ public interface MultiStatusEvent {
     void setOnNetErrorReferenceIdsAction(OnNetErrorReferenceIdsAction onNetErrorReferenceIdsAction);
 
     void setOnLoadingReferenceIdsAction(OnLoadingReferenceIdsAction onLoadingReferenceIdsAction);
+
+    void setViewConstraintProvider(ViewConstraintProvider viewConstraintProvider);
 
 }

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
 import android.support.v4.util.ArrayMap;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,26 +11,26 @@ import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-
 import com.wall_e.multiStatusLayout.R.id;
+import com.wall_e.multiStatusLayout.annotation.ViewConstraintProvider;
 import com.wall_e.multiStatusLayout.interf.OnContentReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnEmptyReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnErrorReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnLoadingReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnNetErrorReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnOtherReferenceIdsAction;
-
-import android.widget.RelativeLayout;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+
+/**
+ * MultiStatusLayout 核心类，View根据不同状态交替切换
+ */
 public class MultiStatusHelper {
 
     private static final String TAG = "MultiStatusHelper";
@@ -141,6 +139,11 @@ public class MultiStatusHelper {
      * 类型对应的索引
      */
     private SparseIntArray mRealIndex = new SparseIntArray(5);
+
+    /**
+     * View和TargetView依赖关系的提供者
+     */
+    private ViewConstraintProvider mViewConstraintProvider;
 
     public MultiStatusHelper(Context context, AttributeSet attrs, int defStyleAttr, ViewGroup viewGroup) {
         mContext = context;
@@ -270,7 +273,9 @@ public class MultiStatusHelper {
         View view;
         if (realIndex == -1) {
             view = ViewGroup.inflate(mContext, layoutResId, null);
-            addViewBlewTargetView(view);
+            if (mViewConstraintProvider != null) {
+                mViewConstraintProvider.addViewBlewTargetView(view, mTargetViewId, mParent);
+            }
             mRealIndex.put(index, mParent.getChildCount() - 1);
         } else {
             view = mParent.getChildAt(realIndex);
@@ -290,34 +295,6 @@ public class MultiStatusHelper {
                 if (onReloadDataListener != null) onReloadDataListener.reloadData();
             }
         });
-    }
-
-    /**
-     * 在View id 为mTargetViewId 下方添加其他状态的view
-     *
-     * @param view 不同状态下的view
-     */
-    private void addViewBlewTargetView(View view) {
-        if (mParent instanceof ConstraintLayout) {
-            ConstraintLayout constraintLayout = (ConstraintLayout) mParent;
-            ConstraintSet constraintSet = new ConstraintSet();
-            constraintLayout.addView(view);
-            constraintSet.clone(constraintLayout);
-            constraintSet.constrainWidth(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
-            constraintSet.constrainHeight(view.getId(), ConstraintLayout.LayoutParams.MATCH_PARENT);
-            constraintSet.connect(view.getId(), ConstraintSet.TOP, mTargetViewId == View.NO_ID ? ConstraintSet.PARENT_ID : mTargetViewId, ConstraintSet.TOP);
-            constraintSet.connect(view.getId(), ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-            constraintSet.connect(view.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-            constraintSet.connect(view.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-            constraintSet.applyTo(constraintLayout);
-        } else if (mParent instanceof RelativeLayout) {
-            RelativeLayout relativeLayout = (RelativeLayout) mParent;
-            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            if (mTargetViewId != View.NO_ID) {
-                layoutParams.addRule(RelativeLayout.BELOW, mTargetViewId);
-            }
-            relativeLayout.addView(view, layoutParams);
-        }
     }
 
 
@@ -625,18 +602,20 @@ public class MultiStatusHelper {
 
     /**
      * 设置网络错误点击重试View的Id
+     *
      * @param netErrorReloadViewId
      */
-    public void setNetErrorReloadViewId(int netErrorReloadViewId){
+    public void setNetErrorReloadViewId(int netErrorReloadViewId) {
         mNetErrorReloadViewId = netErrorReloadViewId;
     }
 
 
     /**
      * 设置服务器错误点击重试View的Id
+     *
      * @param errorReloadViewId
      */
-    public void setErrorReloadViewId(int errorReloadViewId){
+    public void setErrorReloadViewId(int errorReloadViewId) {
         mErrorReloadViewId = errorReloadViewId;
     }
 
@@ -670,5 +649,21 @@ public class MultiStatusHelper {
 
     public void setOnLoadingReferenceIdsAction(OnLoadingReferenceIdsAction onLoadingReferenceIdsAction) {
         this.mOnLoadingReferenceIdsAction = onLoadingReferenceIdsAction;
+    }
+
+    public void setViewConstraintProvider(Class<? extends ViewConstraintProvider> classProvider){
+        if (classProvider==null)return;
+        try {
+            mViewConstraintProvider = classProvider.newInstance();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void setViewConstraintProvider(ViewConstraintProvider viewConstraintProvider){
+        mViewConstraintProvider = viewConstraintProvider;
     }
 }

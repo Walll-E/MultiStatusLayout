@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface MultiStatus {
     Class<? extends ViewGroup>[] value() default {};
+
+    Class<? extends ViewConstraintProvider>[] provider() default {};
 }

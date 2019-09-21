@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.SparseIntArray;
 
 import com.wall_e.multiStatusLayout.MultiStatusConstraintLayout;
 

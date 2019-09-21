@@ -9,9 +9,11 @@ import com.squareup.javapoet.TypeSpec;
 import com.wall_e.multiStatusLayout.annotation.MultiStatus;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -41,6 +43,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
     private Filer mFilter;
     private Elements mElements;
     private Messager mMessager;
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
@@ -62,79 +65,99 @@ public class MultiStatusProcessor extends AbstractProcessor {
     }
 
 
-
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(MultiStatus.class);
-        if (elements==null || elements.isEmpty()){
+        if (elements == null || elements.isEmpty()) {
             return true;
         }
-        mMessager.printMessage(Diagnostic.Kind.NOTE,"<<<<<<<<<<<<<<<<<<< MultiStatusProcessor process START >>>>>>>>>>>>>>>");
-        Set<String> viewClassSet = new HashSet<>();
-        parseParam(elements,viewClassSet);
+        mMessager.printMessage(Diagnostic.Kind.NOTE, "<<<<<<<<<<<<<<<<<<< MultiStatusProcessor process START >>>>>>>>>>>>>>>");
+        Map<String, String> viewProviderMap = new HashMap<>();
+        List<String> viewClassList = new ArrayList<>();
+        List<String> providerClassList = new ArrayList<>();
+        parseParam(elements, viewClassList, providerClassList);
+        mergeList(viewClassList, providerClassList, viewProviderMap);
         try {
-            generate(viewClassSet);
-        }catch (IOException e){
-            mMessager.printMessage(Diagnostic.Kind.ERROR,"Exception occurred when generating class file.");
+            generate(viewProviderMap);
+        } catch (IOException | ClassNotFoundException e) {
+            mMessager.printMessage(Diagnostic.Kind.ERROR, "Exception occurred when generating class file.");
             e.printStackTrace();
         }
-        mMessager.printMessage(Diagnostic.Kind.NOTE,"<<<<<<<<<<<<<<<<<<< MultiStatusProcessor process END >>>>>>>>>>>>>>>");
+        mMessager.printMessage(Diagnostic.Kind.NOTE, "<<<<<<<<<<<<<<<<<<< MultiStatusProcessor process END >>>>>>>>>>>>>>>");
         return true;
     }
 
+    private void mergeList(List<String> viewClassList, List<String> providerClassList, Map<String, String> viewProviderMap) {
+        for (int i = 0; i < viewClassList.size(); i++) {
+            String view = viewClassList.get(i);
+            String provider = providerClassList.get(i);
+            viewProviderMap.put(view, provider);
+        }
+    }
 
 
-    private void parseParam(Set<? extends Element> elements, Set<String> viewClassSet) {
-        for (Element element : elements){
-            checkAnnotationValid(element,MultiStatus.class);
+    private void parseParam(Set<? extends Element> elements, List<String> viewClassList, List<String> providerClassList) {
+        for (Element element : elements) {
+            String name = element.getSimpleName().toString();
+            checkAnnotationValid(element, MultiStatus.class);
             TypeElement typeElement = (TypeElement) element;
             MultiStatus multiStatus = typeElement.getAnnotation(MultiStatus.class);
-            try {
+            addViewClassAndProvider(multiStatus, viewClassList, false);
+            addViewClassAndProvider(multiStatus, providerClassList, true);
+        }
+    }
+
+    private void addViewClassAndProvider(MultiStatus multiStatus, List<String> classList, boolean isProvider) {
+        try {
+            if (isProvider) {
+                multiStatus.provider();
+            } else {
                 multiStatus.value();
-            }catch (MirroredTypesException e){
-                List<? extends TypeMirror> typeMirrors = e.getTypeMirrors();
-                for (TypeMirror typeMirror : typeMirrors){
-                    DeclaredType declaredType = (DeclaredType) typeMirror;
-                    TypeElement classTypeElement = (TypeElement) declaredType.asElement();
-                    String qualifiedName = classTypeElement.getQualifiedName().toString();
-                    viewClassSet.add(qualifiedName);
-                }
+            }
+        } catch (MirroredTypesException e) {
+            List<? extends TypeMirror> typeMirrors = e.getTypeMirrors();
+            for (TypeMirror typeMirror : typeMirrors) {
+                DeclaredType declaredType = (DeclaredType) typeMirror;
+                TypeElement classTypeElement = (TypeElement) declaredType.asElement();
+                String qualifiedName = classTypeElement.getQualifiedName().toString();
+                classList.add(qualifiedName);
             }
         }
     }
 
 
-    private void generate(Set<String> viewClassSet) throws IOException{
-        mMessager.printMessage(Diagnostic.Kind.NOTE,"generate "+viewClassSet.size()+"");
-        for (String clazz : viewClassSet){
+    private void generate(Map<String, String> viewProviderMap) throws IOException, ClassNotFoundException {
+        for (Map.Entry<String, String> entry : viewProviderMap.entrySet()) {
+            String clazz = entry.getKey();
+            String provider = entry.getValue();
             int lastDotIndex = clazz.lastIndexOf(".");
-            String superPackageName = clazz.substring(0,lastDotIndex);
-            String superClassName = clazz.substring(lastDotIndex+1);
+            String superPackageName = clazz.substring(0, lastDotIndex);
+            String superClassName = clazz.substring(lastDotIndex + 1);
             String className;
-            if (superClassName.equals("RelativeLayout")){
-                className = CLASS_PREFIX+"Layout";
-            }else {
-                className = CLASS_PREFIX+superClassName;
+            if (superClassName.equals("RelativeLayout")) {
+                className = CLASS_PREFIX + "Layout";
+            } else {
+                className = CLASS_PREFIX + superClassName;
             }
 
-            mMessager.printMessage(Diagnostic.Kind.NOTE,clazz+"=======>"+className);
+            mMessager.printMessage(Diagnostic.Kind.NOTE, clazz + "=======>" + className);
 
             TypeSpec.Builder builder = TypeSpec.classBuilder(className)
                     .addJavadoc(CLASS_JAVA_DOC)
                     .addModifiers(Modifier.PUBLIC)
-                    .superclass(ClassName.get(superPackageName,superClassName))
-                    .addSuperinterface(ClassName.get(PACKAGE_NAME,"MultiStatusEvent"))
-                    .addField(ClassName.get(PACKAGE_NAME,"MultiStatusHelper"),"mMultiStatusHelper",Modifier.PRIVATE);
+                    .superclass(ClassName.get(superPackageName, superClassName))
+                    .addSuperinterface(ClassName.get(PACKAGE_NAME, "MultiStatusEvent"))
+                    .addField(ClassName.get(PACKAGE_NAME, "MultiStatusHelper"), "mMultiStatusHelper", Modifier.PRIVATE);
 
-            generateMethod(builder,clazz);
+            generateMethod(builder, clazz, provider);
 
-            JavaFile javaFile = JavaFile.builder(PACKAGE_NAME,builder.build()).build();
+            JavaFile javaFile = JavaFile.builder(PACKAGE_NAME, builder.build()).build();
             javaFile.writeTo(mFilter);
         }
     }
 
-    private void generateMethod(TypeSpec.Builder builder, String clazz) {
-        constructor(builder,clazz);
+    private void generateMethod(TypeSpec.Builder builder, String clazz, String providerClassPath) throws ClassNotFoundException {
+        constructor(builder, clazz, providerClassPath);
         showOther(builder);
         showLoading(builder);
         showEmpty(builder);
@@ -157,80 +180,95 @@ public class MultiStatusProcessor extends AbstractProcessor {
         setOnReloadDataListener(builder);
         setErrorReloadViewId(builder);
         setNetErrorReloadViewId(builder);
-        setOnContentReferenceIdsAction(builder);
-        setOnEmptyReferenceIdsAction(builder);
-        setOnErrorReferenceIdsAction(builder);
-        setOnOtherReferenceIdsAction(builder);
-        setOnLoadingReferenceIdsAction(builder);
-        setOnNetErrorReferenceIdsAction(builder);
+        String suffix = ".interf";
+        setOnContentReferenceIdsAction(builder, suffix);
+        setOnEmptyReferenceIdsAction(builder, suffix);
+        setOnErrorReferenceIdsAction(builder, suffix);
+        setOnOtherReferenceIdsAction(builder, suffix);
+        setOnLoadingReferenceIdsAction(builder, suffix);
+        setOnNetErrorReferenceIdsAction(builder, suffix);
+        setViewConstraintProvider(builder);
+        setViewConstraintProviderClass(builder, clazz, providerClassPath);
     }
+
 
     private void setOnReloadDataListener(TypeSpec.Builder builder) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnReloadDataListener")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnReloadDataListener"),"onReloadDataListener")
+                .addParameter(ClassName.get(PACKAGE_NAME, "OnReloadDataListener"), "onReloadDataListener")
                 .addStatement("mMultiStatusHelper.setOnReloadDataListener(onReloadDataListener)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnContentReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnContentReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnContentReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnContentReferenceIdsAction"),"onContentReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnContentReferenceIdsAction"), "onContentReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnContentReferenceIdsAction(onContentReferenceIdsAction)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnOtherReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnOtherReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnOtherReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnOtherReferenceIdsAction"),"onOtherReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnOtherReferenceIdsAction"), "onOtherReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnOtherReferenceIdsAction(onOtherReferenceIdsAction)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnEmptyReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnEmptyReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnEmptyReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnEmptyReferenceIdsAction"),"onEmptyReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnEmptyReferenceIdsAction"), "onEmptyReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnEmptyReferenceIdsAction(onEmptyReferenceIdsAction)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnErrorReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnErrorReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnErrorReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnErrorReferenceIdsAction"),"onErrorReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnErrorReferenceIdsAction"), "onErrorReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnErrorReferenceIdsAction(onErrorReferenceIdsAction)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnNetErrorReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnNetErrorReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnNetErrorReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnNetErrorReferenceIdsAction"),"onNetErrorReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnNetErrorReferenceIdsAction"), "onNetErrorReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnNetErrorReferenceIdsAction(onNetErrorReferenceIdsAction)")
                 .build();
         builder.addMethod(methodSpec);
     }
 
-    private void setOnLoadingReferenceIdsAction(TypeSpec.Builder builder) {
+    private void setOnLoadingReferenceIdsAction(TypeSpec.Builder builder, String suffix) {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOnLoadingReferenceIdsAction")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(ClassName.get(PACKAGE_NAME,"OnLoadingReferenceIdsAction"),"onLoadingReferenceIdsAction")
+                .addParameter(ClassName.get(PACKAGE_NAME + suffix, "OnLoadingReferenceIdsAction"), "onLoadingReferenceIdsAction")
                 .addStatement("mMultiStatusHelper.setOnLoadingReferenceIdsAction(onLoadingReferenceIdsAction)")
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+
+    private void setViewConstraintProvider(TypeSpec.Builder builder) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("setViewConstraintProvider")
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(PACKAGE_NAME + ".annotation", "ViewConstraintProvider"), "viewConstraintProvider")
+                .addStatement("mMultiStatusHelper.setViewConstraintProvider(viewConstraintProvider)")
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -261,7 +299,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setTargetViewId")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"viewId")
+                .addParameter(TypeName.INT, "viewId")
                 .addStatement("mMultiStatusHelper.setTargetViewId(viewId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -271,7 +309,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setNetErrorReloadViewId")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"netErrorReloadViewId")
+                .addParameter(TypeName.INT, "netErrorReloadViewId")
                 .addStatement("mMultiStatusHelper.setNetErrorReloadViewId(netErrorReloadViewId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -282,7 +320,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setErrorReloadViewId")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"errorReloadViewId")
+                .addParameter(TypeName.INT, "errorReloadViewId")
                 .addStatement("mMultiStatusHelper.setErrorReloadViewId(errorReloadViewId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -292,7 +330,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setErrorView")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"layoutId")
+                .addParameter(TypeName.INT, "layoutId")
                 .addStatement("mMultiStatusHelper.setErrorView(layoutId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -302,7 +340,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setEmptyView")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"layoutId")
+                .addParameter(TypeName.INT, "layoutId")
                 .addStatement("mMultiStatusHelper.setEmptyView(layoutId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -312,7 +350,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setNetErrorView")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"layoutId")
+                .addParameter(TypeName.INT, "layoutId")
                 .addStatement("mMultiStatusHelper.setNetErrorView(layoutId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -322,7 +360,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setLoadingView")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"layoutId")
+                .addParameter(TypeName.INT, "layoutId")
                 .addStatement("mMultiStatusHelper.setLoadingView(layoutId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -332,7 +370,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("setOtherView")
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(TypeName.INT,"layoutId")
+                .addParameter(TypeName.INT, "layoutId")
                 .addStatement("mMultiStatusHelper.setOtherView(layoutId)")
                 .build();
         builder.addMethod(methodSpec);
@@ -343,7 +381,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("return mMultiStatusHelper.getErrorView()")
-                .returns(ClassName.get("android.view","View"))
+                .returns(ClassName.get("android.view", "View"))
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -353,7 +391,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("return mMultiStatusHelper.getEmptyView()")
-                .returns(ClassName.get("android.view","View"))
+                .returns(ClassName.get("android.view", "View"))
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -363,7 +401,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("return mMultiStatusHelper.getNetErrorView()")
-                .returns(ClassName.get("android.view","View"))
+                .returns(ClassName.get("android.view", "View"))
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -373,7 +411,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("return mMultiStatusHelper.getLoadingView()")
-                .returns(ClassName.get("android.view","View"))
+                .returns(ClassName.get("android.view", "View"))
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -383,7 +421,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addStatement("return mMultiStatusHelper.getOtherView()")
-                .returns(ClassName.get("android.view","View"))
+                .returns(ClassName.get("android.view", "View"))
                 .build();
         builder.addMethod(methodSpec);
     }
@@ -442,50 +480,69 @@ public class MultiStatusProcessor extends AbstractProcessor {
         builder.addMethod(methodSpec);
     }
 
-    private void constructor(TypeSpec.Builder builder, String clazz) {
-        TypeName contextType = ClassName.get("android.content","Context");
-        TypeName attributeSetType = ClassName.get("android.util","AttributeSet");
+    private void constructor(TypeSpec.Builder builder, String clazz, String providerClassPath) {
+        TypeName contextType = ClassName.get("android.content", "Context");
+        TypeName attributeSetType = ClassName.get("android.util", "AttributeSet");
         MethodSpec constructorOne = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(contextType,"context")
+                .addParameter(contextType, "context")
                 .addStatement("this(context,null)")
                 .build();
         MethodSpec constructorTwo = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(contextType,"context")
-                .addParameter(attributeSetType,"attrs")
+                .addParameter(contextType, "context")
+                .addParameter(attributeSetType, "attrs")
                 .addStatement("this(context,attrs,0)")
                 .build();
         MethodSpec constructorThree = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addParameter(contextType,"context")
-                .addParameter(attributeSetType,"attrs")
-                .addParameter(TypeName.INT,"defStyleAttr")
+                .addParameter(contextType, "context")
+                .addParameter(attributeSetType, "attrs")
+                .addParameter(TypeName.INT, "defStyleAttr")
                 .addStatement("super(context,attrs,defStyleAttr)")
                 .addStatement("mMultiStatusHelper = new MultiStatusHelper(context,attrs,defStyleAttr,this)")
+                .addStatement("generateProviderClass($S)", providerClassPath)
                 .build();
         builder.addMethod(constructorOne)
                 .addMethod(constructorTwo)
                 .addMethod(constructorThree);
     }
 
-    private boolean checkAnnotationValid(Element element,Class clazz){
-        if (element.getKind() != ElementKind.CLASS){
-            printError(element,"%s must be declared on class .",clazz.getSimpleName());
+
+    private void setViewConstraintProviderClass(TypeSpec.Builder builder, String className, String providerClassPath) {
+        MethodSpec methodSpec = MethodSpec.methodBuilder("generateProviderClass")
+                .addModifiers(Modifier.PRIVATE)
+                .addParameter(String.class, "providerClassPath")
+                .beginControlFlow("if(providerClassPath == null)")
+                .addStatement("return")
+                .endControlFlow()
+                .beginControlFlow("try")
+                .addStatement("$T providerClass = $T.forName($S)", Class.class, Class.class, providerClassPath)
+                .addStatement("mMultiStatusHelper.setViewConstraintProvider(providerClass)")
+                .addStatement("} catch ($T e) { \n e.printStackTrace()", ClassNotFoundException.class)
+                .endControlFlow()
+                .build();
+        builder.addMethod(methodSpec);
+    }
+
+
+    private boolean checkAnnotationValid(Element element, Class clazz) {
+        if (element.getKind() != ElementKind.CLASS) {
+            printError(element, "%s must be declared on class .", clazz.getSimpleName());
             return false;
         }
-        if (element.getModifiers().contains(Modifier.PRIVATE)){
-            printError(element,"%s must can not be private .",(TypeElement)element);
+        if (element.getModifiers().contains(Modifier.PRIVATE)) {
+            printError(element, "%s must can not be private .", (TypeElement) element);
             return false;
         }
         return true;
     }
 
-    private void printError(Element element,String message,Object... args){
-        if (args.length>0){
-            message = String.format(message,args);
+    private void printError(Element element, String message, Object... args) {
+        if (args.length > 0) {
+            message = String.format(message, args);
         }
-        mMessager.printMessage(Diagnostic.Kind.ERROR,message,element);
+        mMessager.printMessage(Diagnostic.Kind.ERROR, message, element);
     }
 
     private boolean isAssignable(String childClazz, String superClazz) {
