@@ -6,5 +6,5 @@ import android.view.View;
 import java.util.List;
 
 public interface OnErrorReferenceIdsAction {
-    void showErrorAction(@Nullable List<View> referenceIds);
+    void showErrorAction(@Nullable List<View> referenceViews);
 }

@@ -1,46 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.wall_e.multiStatusLayout.MultiStatusConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.wall_e.multiStatusLayout.MultiStatusFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:id="@+id/statusLayout"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:contentReferenceIds="actionButtonCenter,actionButtonRight,actionButtonLeft"
     app:loadingLayout="@layout/common_loading"
+    app:loadingReferenceIds="actionButtonCenter"
     app:targetViewId="@+id/rl_title"
     tools:context="com.example.wall_e.multistatuslayout.MainActivity">
 
-    <include layout="@layout/title"/>
+    <Button
+        android:id="@+id/btn_multiStatusLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:background="@color/colorAccent"
+        android:text="MultiStatusLayout"
+        android:textColor="#fff" />
+
+    <Button
+        android:id="@+id/btn_multiStatusConstraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:background="@color/colorPrimary"
+        android:text="MultiStatusConstraintLayout"
+        android:textColor="#fff" />
+
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="150dp"
         android:text="请注意二级页面的布局文件用法"
         android:textColor="@color/colorAccent"
-        android:textSize="22dp"
-        android:layout_marginTop="80dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-         />
+        android:textSize="22dp" />
 
     <Button
-        android:layout_marginTop="100dp"
-        android:id="@+id/btn_multiStatusLayout"
-        app:layout_constraintTop_toBottomOf="@+id/tv_title"
-        android:background="@color/colorAccent"
-        android:text="MultiStatusLayout"
+        android:id="@+id/actionButtonRight"
+        android:layout_width="70dp"
+        android:text="Right"
         android:textColor="#fff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="70dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/right"
+        app:srcCompat="@drawable/ic_launcher_foreground" />
+
+
     <Button
-        android:id="@+id/btn_multiStatusConstraintLayout"
-        app:layout_constraintTop_toBottomOf="@+id/btn_multiStatusLayout"
-        android:background="@color/colorPrimary"
-        android:text="MultiStatusConstraintLayout"
+        android:id="@+id/actionButtonCenter"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:text="Center"
         android:textColor="#fff"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/center"
+        />
+
+    <Button
+        android:id="@+id/actionButtonLeft"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:text="Left"
+        android:textColor="#fff"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/left"
+        />
+
+    <include layout="@layout/title" />
 
 
-
-</com.wall_e.multiStatusLayout.MultiStatusConstraintLayout>
+</com.wall_e.multiStatusLayout.MultiStatusFrameLayout>

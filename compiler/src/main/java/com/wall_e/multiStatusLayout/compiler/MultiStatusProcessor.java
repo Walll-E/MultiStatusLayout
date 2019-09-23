@@ -88,9 +88,13 @@ public class MultiStatusProcessor extends AbstractProcessor {
     }
 
     private void mergeList(List<String> viewClassList, List<String> providerClassList, Map<String, String> viewProviderMap) {
+        int providerSize = providerClassList.size();
         for (int i = 0; i < viewClassList.size(); i++) {
             String view = viewClassList.get(i);
-            String provider = providerClassList.get(i);
+            String provider = null;
+            if (!providerClassList.isEmpty() && i < providerSize) {
+                provider = providerClassList.get(i);
+            }
             viewProviderMap.put(view, provider);
         }
     }
@@ -156,7 +160,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         }
     }
 
-    private void generateMethod(TypeSpec.Builder builder, String clazz, String providerClassPath) throws ClassNotFoundException {
+    private void generateMethod(TypeSpec.Builder builder, String clazz, String providerClassPath) {
         constructor(builder, clazz, providerClassPath);
         showOther(builder);
         showLoading(builder);

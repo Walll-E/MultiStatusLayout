@@ -6,5 +6,5 @@ import android.view.View;
 import java.util.List;
 
 public interface OnContentReferenceIdsAction {
-    void showContentAction(@Nullable List<View> referenceIds);
+    void showContentAction(@Nullable List<View> referenceViews);
 }

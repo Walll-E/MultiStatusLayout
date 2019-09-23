@@ -6,6 +6,6 @@ import android.view.View;
 import java.util.List;
 
 public interface OnOtherReferenceIdsAction {
-    void showOtherAction(@Nullable List<View> referenceIds);
+    void showOtherAction(@Nullable List<View> referenceViews);
 }
 
