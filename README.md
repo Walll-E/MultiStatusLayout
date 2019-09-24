@@ -29,7 +29,7 @@ dependencies {
 ### 项目配置
 
 项目中定义一个类，在类顶部添加`MultiStatus`,注意value，和provider中的类必须顺序一致，如果不一致，项目运行起来可能报错或显示有问题。
-下面示例代码中的`RelativeLayoutConstraintProvider`、`ConstraintLayoutConstraintProvider`由本项目提供，其中`FrameLayoutConstraintProvider`是demo中自定义的。
+下面示例代码中的`RelativeLayoutConstraintProvider`、`ConstraintLayoutConstraintProvider`由本项目提供，其中`FrameLayoutConstraintProvider`是demo中自定义的。如下定义完成之后，在AndroidStudio中点击build Project 按钮进行一次编译，即可生成相应的layout，生成的layout开头均为MultiStatus。
 ```
 @MultiStatus(value = {RelativeLayout.class,ConstraintLayout.class, FrameLayout.class},
 provider = {RelativeLayoutConstraintProvider.class, ConstraintLayoutConstraintProvider.class,FrameLayoutConstraintProvider.class})
@@ -110,31 +110,4 @@ statusLayout = (MultiStatusLayout) findViewById(R.id.status_layout);
 |loadingReferenceIds | showLoading()调用后，loadingReferenceIds不受其控制;id之间的间隔英文',' |
 
 ### 提供方法
-| 方法   |  作用  |
-|:-----:|:-------:|
-|showLoading()| 显示加载中布局|
-|showNetError()| 显示网络错误的布局|
-|showEmpty()| 显示数据为空时布局|
-|showError()| 显示数据错误时布局|
-|showContent()|显示成功时的内容|
-|showOther()|显示扩充布局的内容|
-|getLoadingView()|获取加载布局|
-|getNetErrorView()|获取网络错误布局|
-|getEmptyView()|获取数据为空布局|
-|getErrorView()|获取数据错误布局|
-|getOtherView()|获取扩充布局|
-|setOnReloadDataListener()|设置重试监听|
-|setOnContentReferenceIdsAction()|设置当xml布局中设置contentReferenceIds属性时，并且调用showContent()的监听回调|
-|setOnOtherReferenceIdsAction()|设置当xml布局中设置otherReferenceIds属性时，并且调用showOther()的监听回调|
-|setOnEmptyReferenceIdsAction()|设置当xml布局中设置emptyReferenceIds属性时，并且调用showEmpty()的监听回调|
-|setOnErrorReferenceIdsAction()|设置当xml布局中设置errorReferenceIds属性时，并且调用showError()的监听回调|
-|setOnNetErrorReferenceIdsAction()|设置当xml布局中设置netErrorReferenceIds属性时，并且调用showNetError()的监听回调|
-|setOnLoadingReferenceIdsAction()|设置当xml布局中设置loadingReferenceIds属性时，并且调用showLoading()的监听回调|
-|setViewConstraintProvider()|设置自定义ViewConstraintProvider|
-
-
-
-## 关于我
-个人邮箱：walle0228@163.com
-
-[我的简书](http://www.jianshu.com/u/f914004db506)
+| 
