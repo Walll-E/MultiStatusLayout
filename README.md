@@ -38,29 +38,88 @@ public class MultiStatusInit {
 ```
 ### 布局文件使用
 ```
-<com.walle.multistatuslayout.MultiStatusLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/status_layout"
-        android:layout_marginBottom="50dp"
-        app:loadingLayout="@layout/loading_layout"
-        app:emptyLayout="@layout/empty_layout"
-        app:errorLayout="@layout/error_layout"
-        app:netErrorLayout="@layout/net_error_layout"
-        app:targetViewId="@+id/rl_title"
-        app:netErrorReloadViewId="@id/tv_netError"
-        app:errorReloadViewId="@id/tv_error"
-        tools:context="com.example.wall_e.multistatuslayout.MainActivity">
+<?xml version="1.0" encoding="utf-8"?>
+<com.wall_e.multiStatusLayout.MultiStatusFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/statusLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:contentReferenceIds="actionButtonCenter,actionButtonRight,actionButtonLeft"
+    app:loadingLayout="@layout/common_loading"
+    app:loadingReferenceIds="actionButtonCenter"
+    app:targetViewId="@+id/rl_title"
+    tools:context="com.example.wall_e.multistatuslayout.MainActivity">
 
-        <TextView
-            android:text="CONTENT"
-            android:textSize="30dp"
-            android:layout_marginTop="30dp"
-            android:textColor="#FF5399F4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-       
-    </com.walle.multistatuslayout.MultiStatusLayout>
+    <Button
+        android:id="@+id/btn_multiStatusLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="200dp"
+        android:background="@color/colorAccent"
+        android:text="MultiStatusLayout"
+        android:textColor="#fff" />
+
+    <Button
+        android:id="@+id/btn_multiStatusConstraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="250dp"
+        android:background="@color/colorPrimary"
+        android:text="MultiStatusConstraintLayout"
+        android:textColor="#fff" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="150dp"
+        android:text="请注意二级页面的布局文件用法"
+        android:textColor="@color/colorAccent"
+        android:textSize="22dp" />
+
+    <Button
+        android:id="@+id/actionButtonRight"
+        android:layout_width="70dp"
+        android:text="Right"
+        android:textColor="#fff"
+        android:layout_height="70dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="30dp"
+        android:layout_marginRight="30dp"
+        android:background="@drawable/right"
+        app:srcCompat="@drawable/ic_launcher_foreground" />
+
+
+    <Button
+        android:id="@+id/actionButtonCenter"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:text="Center"
+        android:textColor="#fff"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:background="@drawable/center"
+        />
+
+    <Button
+        android:id="@+id/actionButtonLeft"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:text="Left"
+        android:textColor="#fff"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="30dp"
+        android:background="@drawable/left"
+        />
+
+    <include layout="@layout/title" />
+
+
+</com.wall_e.multiStatusLayout.MultiStatusFrameLayout>
+
 
 ```
 ### 代码中使用
@@ -108,6 +167,3 @@ statusLayout = (MultiStatusLayout) findViewById(R.id.status_layout);
 |netErrorReferenceIds | showNetError()调用后，netErrorReferenceIds不受其控制;id之间的间隔英文',' |
 |otherReferenceIds | showOther()调用后，otherReferenceIds不受其控制;id之间的间隔英文',' |
 |loadingReferenceIds | showLoading()调用后，loadingReferenceIds不受其控制;id之间的间隔英文',' |
-
-### 提供方法
-| 
