@@ -3,11 +3,12 @@ package com.example.wall_e.multistatuslayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-public class MultiStatusConstraintLayoutActivity extends BaseActivity {
+public class MultiStatusLinearLayoutActivity extends BaseActivity {
+
 
     @Override
     protected int getLayoutId() {
-        return R.layout.activity_multi_status_constraint_layout;
+        return R.layout.activity_multi_status_linear_layout;
     }
 
     @Override
@@ -43,11 +44,11 @@ public class MultiStatusConstraintLayoutActivity extends BaseActivity {
 
 
     private void initFragment() {
-        ConstraintOtherFragment otherFragment = new ConstraintOtherFragment();
-        ConstraintSuccessFragment successFragment = new ConstraintSuccessFragment();
-        ConstraintNetErrorFragment netErrorFragment = new ConstraintNetErrorFragment();
-        ConstraintEmptyFragment emptyFragment = new ConstraintEmptyFragment();
-        ConstraintErrorFragment errorFragment = new ConstraintErrorFragment();
+        LinearLayoutOtherFragment otherFragment = new LinearLayoutOtherFragment();
+        LinearLayoutSuccessFragment successFragment = new LinearLayoutSuccessFragment();
+        LinearLayoutNetErrorFragment netErrorFragment = new LinearLayoutNetErrorFragment();
+        LinearLayoutEmptyFragment emptyFragment = new LinearLayoutEmptyFragment();
+        LinearLayoutErrorFragment errorFragment = new LinearLayoutErrorFragment();
         fragments.add(otherFragment);
         fragments.add(successFragment);
         fragments.add(netErrorFragment);

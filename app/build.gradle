@@ -33,6 +33,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':library')
     annotationProcessor project(':compiler')
+//    implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.5'
+//    annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.5'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.zhy:base-rvadapter:3.0.3'
 }

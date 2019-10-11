@@ -1,6 +1,7 @@
 package com.example.wall_e.multistatuslayout;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.wall_e.multiStatusLayout.MultiStatusFrameLayout;
+import com.wall_e.multiStatusLayout.MultiStatusLinearLayout;
 import com.wall_e.multiStatusLayout.interf.OnContentReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnLoadingReferenceIdsAction;
 
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
             constraintLayout.showContent();
         }
     };
-    private MultiStatusFrameLayout constraintLayout;
+    private MultiStatusLinearLayout constraintLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,5 +54,6 @@ public class MainActivity extends AppCompatActivity {
         });
         findViewById(R.id.btn_multiStatusLayout).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MultiStatusLayoutActivity.class)));
         findViewById(R.id.btn_multiStatusConstraintLayout).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MultiStatusConstraintLayoutActivity.class)));
+        findViewById(R.id.btn_linearLayout).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, MultiStatusLinearLayoutActivity.class)));
     }
 }

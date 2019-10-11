@@ -5,6 +5,6 @@ import android.view.View;
 
 import java.util.List;
 
-public interface OnLoadingReferenceIdsAction {
+public interface OnLoadingReferenceIdsAction extends OnReferenceViewAction{
     void showLoadingAction(@Nullable List<View> referenceViews);
 }

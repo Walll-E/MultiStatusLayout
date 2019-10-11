@@ -5,6 +5,6 @@ import android.view.View;
 
 import java.util.List;
 
-public interface OnNetErrorReferenceIdsAction {
+public interface OnNetErrorReferenceIdsAction extends OnReferenceViewAction{
     void showNetErrorAction(@Nullable List<View> referenceViews);
 }

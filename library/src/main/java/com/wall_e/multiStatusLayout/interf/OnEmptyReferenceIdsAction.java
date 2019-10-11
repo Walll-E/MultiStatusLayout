@@ -5,6 +5,6 @@ import android.view.View;
 
 import java.util.List;
 
-public interface OnEmptyReferenceIdsAction {
+public interface OnEmptyReferenceIdsAction extends OnReferenceViewAction{
     void showEmptyAction(@Nullable List<View> referenceViews);
 }

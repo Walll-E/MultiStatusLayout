@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wall_e.multiStatusLayout.MultiStatusLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/statusLayout"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:errorLayout="@layout/common_error"
+    app:loadingLayout="@layout/common_loading"
+    tools:context=".LinearLayoutErrorFragment">
+
+
+</com.wall_e.multiStatusLayout.MultiStatusLinearLayout>

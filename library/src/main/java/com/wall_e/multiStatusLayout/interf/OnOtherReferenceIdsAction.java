@@ -5,7 +5,7 @@ import android.view.View;
 
 import java.util.List;
 
-public interface OnOtherReferenceIdsAction {
+public interface OnOtherReferenceIdsAction extends OnReferenceViewAction{
     void showOtherAction(@Nullable List<View> referenceViews);
 }
 

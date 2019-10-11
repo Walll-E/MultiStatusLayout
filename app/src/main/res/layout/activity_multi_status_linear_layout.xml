@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.wall_e.multiStatusLayout.MultiStatusFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MultiStatusLinearLayoutActivity">
+    <FrameLayout
+        android:id="@+id/ll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="48dp"
+        />
+    <RadioGroup
+        android:id="@+id/rgp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/rb_other"
+            style="@style/rb"
+            android:background="#FFFFE240"
+            android:text="Other" />
+
+        <RadioButton
+            android:id="@+id/rb_loading"
+            style="@style/rb"
+            android:background="#4FCC3C"
+            android:text="Loading" />
+
+        <RadioButton
+            android:id="@+id/rb_netError"
+            style="@style/rb"
+            android:background="#FF40C3FF"
+            android:text="NetError" />
+
+        <RadioButton
+            android:id="@+id/rb_empty"
+            style="@style/rb"
+            android:background="#FFFF40FC"
+            android:text="Empty" />
+
+        <RadioButton
+            android:id="@+id/rb_error"
+            style="@style/rb"
+            android:background="#FFFF4059"
+            android:text="Error" />
+    </RadioGroup>
+
+
+</com.wall_e.multiStatusLayout.MultiStatusFrameLayout>

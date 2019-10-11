@@ -2,6 +2,10 @@ package com.wall_e.multiStatusLayout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.IntRange;
 import android.support.annotation.Nullable;
 import android.support.v4.util.ArrayMap;
@@ -11,6 +15,9 @@ import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.widget.GridLayout;
+import android.widget.LinearLayout;
+
 import com.wall_e.multiStatusLayout.R.id;
 import com.wall_e.multiStatusLayout.annotation.ViewConstraintProvider;
 import com.wall_e.multiStatusLayout.interf.OnContentReferenceIdsAction;
@@ -19,11 +26,14 @@ import com.wall_e.multiStatusLayout.interf.OnErrorReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnLoadingReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnNetErrorReferenceIdsAction;
 import com.wall_e.multiStatusLayout.interf.OnOtherReferenceIdsAction;
+import com.wall_e.multiStatusLayout.interf.OnReferenceViewAction;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -238,9 +248,11 @@ public class MultiStatusHelper {
      * @param type     存放view容器中的索引
      */
     private void showView(int layoutId, int type) {
-        //如果子控件处于显示状态先隐藏所有的子控件
-        hideViews(type);
         View view = inflateAndAddViewInLayout(type, layoutId);
+        if (!hasBackground(view)) {
+            hideViews(type);
+        }
+        //如果子控件处于显示状态先隐藏所有的子控件
         if (view.getVisibility() != VISIBLE) {
             view.setVisibility(VISIBLE);
         }
@@ -258,6 +270,26 @@ public class MultiStatusHelper {
                     isAddErrorClickEvent = true;
                 }
                 break;
+        }
+    }
+
+    /**
+     * 如果有背景，则不需要隐藏其他view
+     *
+     * @param view
+     * @return
+     */
+    private boolean hasBackground(View view) {
+        if (mParent instanceof LinearLayout || mParent instanceof GridLayout) {
+            return false;
+        } else {
+            Drawable drawable = view.getBackground();
+            if (drawable instanceof ColorDrawable) {
+                ColorDrawable colorDrawable = (ColorDrawable) drawable;
+                int color = colorDrawable.getColor();
+                return color != Color.TRANSPARENT;
+            }
+            return drawable instanceof BitmapDrawable;
         }
     }
 
@@ -358,6 +390,8 @@ public class MultiStatusHelper {
      * @param type
      */
     private void hideViews(int type) {
+        ViewGroup parent = mParent;
+        int targetViewId = mTargetViewId;
         int count = mParent.getChildCount();
         List<Integer> referenceIds = null;
         if (mReferenceIds != null) {
@@ -368,31 +402,31 @@ public class MultiStatusHelper {
         List<View> views;
         switch (type) {
             case OTHER_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds);
+                views = accordingToTypeShow(realIndex, referenceIds, mOnOtherReferenceIdsAction, parent, targetViewId);
                 if (mOnOtherReferenceIdsAction != null) {
                     mOnOtherReferenceIdsAction.showOtherAction(views);
                 }
                 break;
             case LOADING_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds);
+                views = accordingToTypeShow(realIndex, referenceIds, mOnLoadingReferenceIdsAction, parent, targetViewId);
                 if (mOnLoadingReferenceIdsAction != null) {
                     mOnLoadingReferenceIdsAction.showLoadingAction(views);
                 }
                 break;
             case EMPTY_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds);
+                views = accordingToTypeShow(realIndex, referenceIds, mOnEmptyReferenceIdsAction, parent, targetViewId);
                 if (mOnEmptyReferenceIdsAction != null) {
                     mOnEmptyReferenceIdsAction.showEmptyAction(views);
                 }
                 break;
             case ERROR_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds);
+                views = accordingToTypeShow(realIndex, referenceIds, mOnErrorReferenceIdsAction, parent, targetViewId);
                 if (mOnErrorReferenceIdsAction != null) {
                     mOnErrorReferenceIdsAction.showErrorAction(views);
                 }
                 break;
             case NET_ERROR_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds);
+                views = accordingToTypeShow(realIndex, referenceIds, mOnNetErrorReferenceIdsAction, parent, targetViewId);
                 if (mOnNetErrorReferenceIdsAction != null) {
                     mOnNetErrorReferenceIdsAction.showNetErrorAction(views);
                 }
@@ -400,8 +434,8 @@ public class MultiStatusHelper {
             default:
                 for (int i = 0; i < count; i++) {
                     if (i == realIndex) continue;
-                    View view = mParent.getChildAt(i);
-                    if (mTargetViewId != view.getId()
+                    View view = parent.getChildAt(i);
+                    if (targetViewId != view.getId()
                             && view.getVisibility() != GONE
                             && !(view instanceof ViewStub)
                     ) {
@@ -412,7 +446,7 @@ public class MultiStatusHelper {
         }
     }
 
-    private List<View> accordingToTypeShow(int realIndex, List<Integer> referenceIds) {
+    private List<View> accordingToTypeShow(int realIndex, List<Integer> referenceIds, OnReferenceViewAction action, ViewGroup mParent, int mTargetViewId) {
         List<View> views = new ArrayList<>();
         int childCount = mParent.getChildCount();
         for (int i = 0; i < childCount; i++) {
@@ -420,7 +454,8 @@ public class MultiStatusHelper {
             View view = mParent.getChildAt(i);
             int id = view.getId();
             if (referenceIds.contains(id)) {
-                views.add(view);
+                if (action != null)
+                    views.add(view);
                 continue;
             }
             if (mTargetViewId != view.getId()
@@ -463,7 +498,7 @@ public class MultiStatusHelper {
                     contentView.add(view);
                 continue;
             }
-            if (!(view instanceof ViewStub)) {
+            if (!(view instanceof ViewStub) && view.getVisibility() != VISIBLE) {
                 view.setVisibility(VISIBLE);
             }
         }
@@ -651,8 +686,8 @@ public class MultiStatusHelper {
         this.mOnLoadingReferenceIdsAction = onLoadingReferenceIdsAction;
     }
 
-    public void setViewConstraintProvider(Class<? extends ViewConstraintProvider> classProvider){
-        if (classProvider==null)return;
+    public void setViewConstraintProvider(Class<? extends ViewConstraintProvider> classProvider) {
+        if (classProvider == null) return;
         try {
             mViewConstraintProvider = classProvider.newInstance();
         } catch (IllegalAccessException e) {
@@ -663,7 +698,7 @@ public class MultiStatusHelper {
     }
 
 
-    public void setViewConstraintProvider(ViewConstraintProvider viewConstraintProvider){
+    public void setViewConstraintProvider(ViewConstraintProvider viewConstraintProvider) {
         mViewConstraintProvider = viewConstraintProvider;
     }
 }

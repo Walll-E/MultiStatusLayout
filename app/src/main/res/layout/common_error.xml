@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:id="@+id/common_error"
     android:gravity="center"
+    android:textColor="#fff"
+    android:background="@color/cardview_dark_background"
     android:text="服务器有问题，点击重试！"
-    android:layout_height="wrap_content"/>
+    android:layout_height="match_parent"/>
 
