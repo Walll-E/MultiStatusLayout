@@ -10,7 +10,16 @@ import com.wall_e.multiStatusLayout.constraint.ConstraintLayoutConstraintProvide
 import com.wall_e.multiStatusLayout.constraint.RelativeLayoutConstraintProvider;
 
 
-@MultiStatus(value = {RelativeLayout.class, ConstraintLayout.class, FrameLayout.class, LinearLayout.class},
-        provider = {RelativeLayoutConstraintProvider.class, ConstraintLayoutConstraintProvider.class, FrameLayoutConstraintProvider.class, LinearLayoutConstraintProvider.class})
+@MultiStatus(value = {
+        RelativeLayout.class,
+        ConstraintLayout.class,
+        FrameLayout.class,
+        LinearLayout.class},
+
+        provider = {
+                RelativeLayoutConstraintProvider.class,
+                ConstraintLayoutConstraintProvider.class,
+                FrameLayoutConstraintProvider.class,
+                LinearLayoutConstraintProvider.class})
 public class MultiStatusInit {
 }

@@ -308,7 +308,12 @@ public class MultiStatusHelper {
             if (mViewConstraintProvider != null) {
                 mViewConstraintProvider.addViewBlewTargetView(view, mTargetViewId, mParent);
             }
-            mRealIndex.put(index, mParent.getChildCount() - 1);
+            realIndex = mParent.indexOfChild(view);
+            if (realIndex == -1) {
+                mParent.addView(view);
+                realIndex = mParent.getChildCount()-1;
+            }
+            mRealIndex.put(index, realIndex);
         } else {
             view = mParent.getChildAt(realIndex);
         }
@@ -402,31 +407,31 @@ public class MultiStatusHelper {
         List<View> views;
         switch (type) {
             case OTHER_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds, mOnOtherReferenceIdsAction, parent, targetViewId);
+                views = accordingToTypeHide(realIndex, referenceIds, mOnOtherReferenceIdsAction, parent, targetViewId);
                 if (mOnOtherReferenceIdsAction != null) {
                     mOnOtherReferenceIdsAction.showOtherAction(views);
                 }
                 break;
             case LOADING_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds, mOnLoadingReferenceIdsAction, parent, targetViewId);
+                views = accordingToTypeHide(realIndex, referenceIds, mOnLoadingReferenceIdsAction, parent, targetViewId);
                 if (mOnLoadingReferenceIdsAction != null) {
                     mOnLoadingReferenceIdsAction.showLoadingAction(views);
                 }
                 break;
             case EMPTY_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds, mOnEmptyReferenceIdsAction, parent, targetViewId);
+                views = accordingToTypeHide(realIndex, referenceIds, mOnEmptyReferenceIdsAction, parent, targetViewId);
                 if (mOnEmptyReferenceIdsAction != null) {
                     mOnEmptyReferenceIdsAction.showEmptyAction(views);
                 }
                 break;
             case ERROR_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds, mOnErrorReferenceIdsAction, parent, targetViewId);
+                views = accordingToTypeHide(realIndex, referenceIds, mOnErrorReferenceIdsAction, parent, targetViewId);
                 if (mOnErrorReferenceIdsAction != null) {
                     mOnErrorReferenceIdsAction.showErrorAction(views);
                 }
                 break;
             case NET_ERROR_TYPE:
-                views = accordingToTypeShow(realIndex, referenceIds, mOnNetErrorReferenceIdsAction, parent, targetViewId);
+                views = accordingToTypeHide(realIndex, referenceIds, mOnNetErrorReferenceIdsAction, parent, targetViewId);
                 if (mOnNetErrorReferenceIdsAction != null) {
                     mOnNetErrorReferenceIdsAction.showNetErrorAction(views);
                 }
@@ -446,16 +451,29 @@ public class MultiStatusHelper {
         }
     }
 
-    private List<View> accordingToTypeShow(int realIndex, List<Integer> referenceIds, OnReferenceViewAction action, ViewGroup mParent, int mTargetViewId) {
-        List<View> views = new ArrayList<>();
+    /**
+     * 针对不同的类型，做出相应的逻辑操作
+     *
+     * @param realIndex
+     * @param referenceIds
+     * @param action
+     * @param mParent
+     * @param mTargetViewId
+     * @return
+     */
+    private List<View> accordingToTypeHide(int realIndex, List<Integer> referenceIds, OnReferenceViewAction action, ViewGroup mParent, int mTargetViewId) {
+        List<View> views = null;
         int childCount = mParent.getChildCount();
         for (int i = 0; i < childCount; i++) {
             if (i == realIndex) continue;
             View view = mParent.getChildAt(i);
             int id = view.getId();
             if (referenceIds.contains(id)) {
-                if (action != null)
-                    views.add(view);
+                if (action == null) continue;
+                if (views == null) {
+                    views = new ArrayList<>();
+                }
+                views.add(view);
                 continue;
             }
             if (mTargetViewId != view.getId()

@@ -41,14 +41,12 @@ public class MultiStatusProcessor extends AbstractProcessor {
     private static final String PACKAGE_NAME = "com.wall_e.multiStatusLayout";
     private static final String CLASS_PREFIX = "MultiStatus";
     private Filer mFilter;
-    private Elements mElements;
     private Messager mMessager;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         mFilter = processingEnvironment.getFiler();
-        mElements = processingEnvironment.getElementUtils();
         mMessager = processingEnvironment.getMessager();
     }
 
@@ -79,7 +77,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
         mergeList(viewClassList, providerClassList, viewProviderMap);
         try {
             generate(viewProviderMap);
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException  e) {
             mMessager.printMessage(Diagnostic.Kind.ERROR, "Exception occurred when generating class file.");
             e.printStackTrace();
         }
@@ -130,7 +128,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
     }
 
 
-    private void generate(Map<String, String> viewProviderMap) throws IOException, ClassNotFoundException {
+    private void generate(Map<String, String> viewProviderMap) throws IOException {
         for (Map.Entry<String, String> entry : viewProviderMap.entrySet()) {
             String clazz = entry.getKey();
             String provider = entry.getValue();
@@ -521,7 +519,7 @@ public class MultiStatusProcessor extends AbstractProcessor {
                 .addStatement("return")
                 .endControlFlow()
                 .beginControlFlow("try")
-                .addStatement("$T providerClass = $T.forName($S)", Class.class, Class.class, providerClassPath)
+                .addStatement("$T providerClass = $T.forName(providerClassPath)", Class.class, Class.class)
                 .addStatement("mMultiStatusHelper.setViewConstraintProvider(providerClass)")
                 .addStatement("} catch ($T e) { \n e.printStackTrace()", ClassNotFoundException.class)
                 .endControlFlow()
