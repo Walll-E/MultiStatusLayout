@@ -13,12 +13,13 @@ allprojects {
     
     
 dependencies {
-        implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.5'
-        annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.5'
+        implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.6'
+        annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.6'
     }
 ```
-
-
+### 1.0.6 版本相较于 1.0.5 版本有如下升级：
+- 如果判断`NetErrorView`、`LoadingView`、`EmptyView`等有背景，调用`showLoading`、`showEmpty`等方法时，不会隐藏其他控件（继承自`LinearLayout`、`GridLayout`除外），会将这几种类型的`View`直接添加进父布局
+- 优化部分代码逻辑
 ### 1.0.5 版本相较于 1.0.4 版本有如下升级：
 - 增加`showContent`等方法调用时，contentReferenceIds等引用的控件id，不受其控制
 - 原来只支持`RelativeLayout`、`ConstraintLayout`这两种系统提供的控件，现在支持自定义扩展更多`ViewGroup`
