@@ -13,8 +13,8 @@ allprojects {
     
     
 dependencies {
-        implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.7'
-        annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.7'
+        implementation 'com.github.Walll-E.MultiStatusLayout:library:1.0.8'
+        annotationProcessor 'com.github.Walll-E.MultiStatusLayout:compiler:1.0.8'
     }
 ```
 ### 1.0.7 版本相较于 1.0.5 版本有如下升级：
