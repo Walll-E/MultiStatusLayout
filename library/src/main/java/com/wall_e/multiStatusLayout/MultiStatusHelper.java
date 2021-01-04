@@ -84,7 +84,7 @@ public class MultiStatusHelper {
     /**
      * 布局中的不隐藏的View的id
      */
-    private int mTargetViewId = View.NO_ID;
+    private int mTargetViewId = -2;
     /**
      * 服务端错误重试按钮id
      */
@@ -485,7 +485,7 @@ public class MultiStatusHelper {
         return views;
     }
 
-    private boolean isCollectionEmpty(Collection e) {
+    private <T> boolean isCollectionEmpty(Collection<T> e) {
         return e == null || e.isEmpty();
     }
 

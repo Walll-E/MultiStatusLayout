@@ -42,6 +42,8 @@ public abstract class BaseFragment extends Fragment {
     private void lazyLoad() {
         if (isViewCreated && isUIVisible) {
             initView();
+            isViewCreated = false;
+            isUIVisible = false;
         }
     }
 

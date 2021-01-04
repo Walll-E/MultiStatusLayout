@@ -80,5 +80,9 @@
         android:text="Left"
         android:textColor="#fff" />
 
+    <Button
+        android:text="我是测试按钮"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </com.wall_e.multiStatusLayout.MultiStatusLinearLayout>
